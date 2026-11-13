@@ -50,7 +50,7 @@ export function WaitingList({ tokens, now, interval, lastServeAt, onMove, onCanc
               <span className="sr-only">Position </span>
               {i + 1}
             </span>
-            <span className="ticket num inline-flex h-10 min-w-16 items-center justify-center pr-2.5 pl-2 text-lg font-semibold">
+            <span className="ticket num inline-flex h-10 min-w-16 items-center justify-center justify-self-start pr-2.5 pl-2 text-lg font-semibold">
               #{t.number}
             </span>
             <div className="min-w-0">
@@ -64,8 +64,8 @@ export function WaitingList({ tokens, now, interval, lastServeAt, onMove, onCanc
             </div>
 
             {/* Phones: wait + estimate wrap to a second line under the name. */}
-            <div className="col-span-2 col-start-3 row-start-2 flex items-center gap-4 text-sm sm:contents">
-              <p className={`flex items-center gap-1.5 ${long ? "font-medium text-warn-ink" : "text-ink-2"}`}>
+            <div className="col-span-3 col-start-2 row-start-2 flex items-center gap-4 text-sm whitespace-nowrap sm:contents">
+              <p className={`flex items-center gap-1.5 whitespace-nowrap ${long ? "font-medium text-warn-ink" : "text-ink-2"}`}>
                 <IconClock />
                 <span>
                   <span className="sr-only">Waited </span>
@@ -73,14 +73,14 @@ export function WaitingList({ tokens, now, interval, lastServeAt, onMove, onCanc
                   {long ? " · long wait" : ""}
                 </span>
               </p>
-              <p className="text-ink-2" title="Estimated time until called, from the recent serving pace">
+              <p className="whitespace-nowrap text-ink-2" title="Estimated time until called, from the recent serving pace">
                 <span className="text-ink-3 sm:sr-only">est. </span>
                 <span className="sr-only">Estimated wait </span>
-                <span className="num">{formatEstimate(est)}</span>
+                <span className="tnum">{formatEstimate(est)}</span>
               </p>
             </div>
 
-            <div className="col-start-4 row-start-1 flex items-center gap-0.5 sm:col-start-auto">
+            <div className="col-start-4 row-start-1 flex items-center gap-0.5 sm:col-start-6 sm:row-start-1">
               <Button
                 variant="ghost"
                 size="sm"

@@ -138,7 +138,9 @@ function simulate(spec: QueueSpec, windows: [number, number][], now: number) {
         all.push(tok);
         waiting.push(tok);
         events.push({ type: "token_added", token: tok, at: t, waitingAfter: waiting.length });
-        // ~4% are priority (elderly, emergency): moved up one place a minute later.
+        // ~4% are priority (elderly, emergency): moved up one place right after arriving.
+        // The event is stamped 1 ms after the arrival so its waitingAfter is still true
+        // (stamping it a minute later let serves in between make the count stale).
         if (waiting.length >= 3 && rand() < 0.04) {
           const i = waiting.length - 1;
           const ahead = waiting[i - 1];
@@ -146,8 +148,8 @@ function simulate(spec: QueueSpec, windows: [number, number][], now: number) {
           waiting[i - 1] = tok;
           waiting[i] = ahead;
           tok.lastMove = "up";
-          tok.lastMovedAt = t + MIN;
-          events.push({ type: "moved_up", token: tok, at: t + MIN, waitingAfter: waiting.length });
+          tok.lastMovedAt = t + 1;
+          events.push({ type: "moved_up", token: tok, at: t + 1, waitingAfter: waiting.length });
         }
       } else if (t === nextServe) {
         const tok = waiting.shift()!;

@@ -37,15 +37,20 @@ function isUniqueViolation(err: unknown): boolean {
 /* Reads                                                               */
 /* ------------------------------------------------------------------ */
 
+// Drizzle renders ${queues.id} as a bare "id" in a single-table select, which
+// inside a correlated subquery resolves to the *subquery's* table (tokens.id).
+// Always reference the outer row fully qualified. (B-01)
+const OUTER_QUEUE_ID = sql.raw(`"queues"."id"`);
+
 export async function listQueues(db: Db, ownerId: string): Promise<QueueSummaryDTO[]> {
   const rows = await db
     .select({
       id: queues.id,
       name: queues.name,
       createdAt: queues.createdAt,
-      waiting: sql<number>`(select count(*)::int from ${tokens} t where t.queue_id = ${queues.id} and t.status = 'waiting')`,
-      oldestWaitingSince: sql<Date | null>`(select min(t.created_at) from ${tokens} t where t.queue_id = ${queues.id} and t.status = 'waiting')`,
-      nowServingNumber: sql<number | null>`(select t.number from ${tokens} t where t.queue_id = ${queues.id} and t.status = 'served' order by t.served_at desc limit 1)`,
+      waiting: sql<number>`(select count(*)::int from ${tokens} t where t.queue_id = ${OUTER_QUEUE_ID} and t.status = 'waiting')`,
+      oldestWaitingSince: sql<Date | null>`(select min(t.created_at) from ${tokens} t where t.queue_id = ${OUTER_QUEUE_ID} and t.status = 'waiting')`,
+      nowServingNumber: sql<number | null>`(select t.number from ${tokens} t where t.queue_id = ${OUTER_QUEUE_ID} and t.status = 'served' order by t.served_at desc limit 1)`,
     })
     .from(queues)
     .where(eq(queues.ownerId, ownerId))

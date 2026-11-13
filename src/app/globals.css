@@ -124,6 +124,11 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Durations and figures with words ("14 min"): tabular digits, UI font. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
 /* Ticket stub: the token number's mark. The dashed edge is the tear line of a
    paper token, the one decorative device in the app. */
 .ticket {

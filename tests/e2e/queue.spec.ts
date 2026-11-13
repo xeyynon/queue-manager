@@ -38,7 +38,7 @@ test("wrong password shows a clear error", async ({ page }) => {
   await page.getByLabel("Email").fill("nobody@test.local");
   await page.getByLabel("Password").fill("wrong-password");
   await page.locator("form").getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByRole("alert")).toContainText("don't match");
+  await expect(page.locator("main form").getByRole("alert")).toContainText("don't match");
 });
 
 test("full queue flow: create, add, reorder, serve, cancel + undo, dashboard", async ({ page }) => {
@@ -104,6 +104,7 @@ test("keyboard shortcuts: A adds, S serves, ? opens help", async ({ page, isMobi
   await createQueue(page, "Keys");
   await page.locator("body").click({ position: { x: 5, y: 300 } });
   await page.keyboard.press("a");
+  await expect(page.getByTestId("waiting-row")).toHaveCount(1);
   await page.keyboard.press("a");
   await expect(page.getByTestId("waiting-row")).toHaveCount(2);
   await page.keyboard.press("s");
@@ -114,13 +115,23 @@ test("keyboard shortcuts: A adds, S serves, ? opens help", async ({ page, isMobi
   await expect(page.getByRole("dialog")).toBeHidden();
 });
 
+test("double-clicking Add token issues one token, not two", async ({ page }) => {
+  await signUp(page);
+  await createQueue(page, "Guard");
+  await page.getByRole("button", { name: /Add token/ }).dblclick();
+  await expect(page.getByTestId("waiting-row")).toHaveCount(1);
+  await page.waitForTimeout(1000);
+  await page.reload();
+  await expect(page.getByTestId("waiting-row")).toHaveCount(1);
+});
+
 test("duplicate queue names are rejected with a message", async ({ page }) => {
   await signUp(page);
   await createQueue(page, "Billing");
   await page.goto("/queues");
   await page.getByLabel("Queue name").fill("billing");
   await page.getByRole("button", { name: "Create queue" }).click();
-  await expect(page.getByRole("alert")).toContainText("already have a queue");
+  await expect(page.locator("main form").getByRole("alert")).toContainText("already have a queue");
 });
 
 test("another manager's queue is not reachable", async ({ page, browser }) => {

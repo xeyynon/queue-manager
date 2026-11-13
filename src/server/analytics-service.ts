@@ -7,7 +7,7 @@ import { AppError } from "./errors";
 
 const RANGE_DAYS: Record<Range, number> = { today: 1, "7d": 7, "30d": 30 };
 // Bucket for the queue-length chart: fine enough to see a rush, coarse enough to read.
-const LENGTH_BUCKET_MIN: Record<Range, number> = { today: 15, "7d": 60, "30d": 360 };
+const LENGTH_BUCKET_MIN: Record<Range, number> = { today: 15, "7d": 60, "30d": 1440 };
 
 type Num = number | string | null;
 const num = (v: Num) => (v === null ? null : Number(v));

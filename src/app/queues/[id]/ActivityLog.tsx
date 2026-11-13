@@ -11,7 +11,7 @@ const VERB: Record<EventDTO["type"], string> = {
   restored: "put back (undo)",
 };
 
-const time = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+const time = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" });
 
 /** The audit trail: every add, reorder, serve and cancel, with who and when. */
 export function ActivityLog({ events }: { events: EventDTO[] }) {

@@ -84,7 +84,7 @@ export function Dashboard({
         <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
         <p className="text-sm text-ink-3" role="status">
           {error && data ? <span className="text-warn-ink">Update failed · showing data from </span> : "Updated "}
-          {updatedAt ? <span className="num">{updatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</span> : "…"}
+          {updatedAt ? <span className="num">{updatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" })}</span> : "…"}
           {" · refreshes every 30 s"}
         </p>
       </div>
@@ -177,7 +177,12 @@ export function Dashboard({
               Queue length
             </h2>
             <p className="text-sm text-ink-2">
-              Most people waiting at once, per {data.queueLengthBucketMinutes >= 60 ? `${data.queueLengthBucketMinutes / 60} h` : `${data.queueLengthBucketMinutes} min`}
+              Most people waiting at once, per{" "}
+              {data.queueLengthBucketMinutes === 1440
+                ? "day"
+                : data.queueLengthBucketMinutes >= 60
+                  ? `${data.queueLengthBucketMinutes / 60} h`
+                  : `${data.queueLengthBucketMinutes} min`}
             </p>
             <QueueLengthChart data={data} />
           </section>
@@ -191,7 +196,7 @@ export function Dashboard({
                 <p className="text-sm text-ink-2">
                   {data.busiest ? (
                     <>
-                      Busiest {data.bucketUnit}: <span className="num font-medium text-ink">{bucketLabel(data.busiest.bucket, data.bucketUnit)}</span> with{" "}
+                      Busiest {data.bucketUnit}: <span className="tnum font-medium text-ink">{bucketLabel(data.busiest.bucket, data.bucketUnit)}</span> with{" "}
                       <span className="num">{data.busiest.arrivals}</span> arrivals
                     </>
                   ) : (
@@ -216,7 +221,7 @@ function Figure({ label, value, note }: { label: string; value: string; note: st
   return (
     <div className="min-w-0">
       <p className="text-sm text-ink-2">{label}</p>
-      <p className="num mt-1 text-3xl font-semibold tracking-tight text-ink">{value}</p>
+      <p className="tnum mt-1 text-3xl font-semibold tracking-tight text-ink">{value}</p>
       <p className="mt-1 text-xs text-ink-3">{note}</p>
     </div>
   );

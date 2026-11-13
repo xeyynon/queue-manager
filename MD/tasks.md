@@ -12,16 +12,18 @@ When you tick something, add the date and the build or InBul that carried it.
 - [x] Queue list + queue console UI (optimistic, undo, shortcuts, activity log) (2026-11-14)
 - [x] Unit tests (95 passing), contrast script, colour/token guard tests (2026-11-14)
 - [x] DB integration tests + E2E specs written (2026-11-14)
-- [ ] **User:** create Neon project + `test` branch; fill `.env.local` (blocks everything below)
-- [ ] `npm run db:migrate` on dev and test branches
-- [ ] Run `npm run test:db` — fix whatever fails
-- [ ] Run the app in a browser; screenshot every screen at 390, 820, 1280, 1920 in light + dark
-- [ ] Run `npm run test:e2e` (desktop + phone)
-- [ ] `git init`, first commit + GitHub repo (when the user asks)
+- [x] Local Docker Postgres (DEC-017); migrated dev + test (2026-11-14)
+- [x] `npm run test:db`: 25/25 (2026-11-14); removing the lock makes 8 fail, so the tests do guard the locking
+- [x] Browser check: 42 screenshots, 390/820/1280/1920 × light/dark, no console errors or overflow (2026-11-14, `MD/ux_audit/2026-11-14/`)
+- [x] `npm run test:e2e`: 13 passed + 1 skipped (keyboard on phone) (2026-11-14)
+- [x] Fixed B-01…B-07 (2026-11-14, uncommitted)
+- [x] git init, first commit 1efdb34, GitHub repo xeyynon/queue-manager (now private) (2026-11-14)
+- [ ] Commit + push the B-01…B-07 fixes (when the user asks)
+- [ ] **User:** Neon project + `test` branch, then swap `.env.local`, migrate, seed
 - [ ] Deploy to Vercel + Neon; seed demo; warm the DB before the demo
 
 ## P1
-- [ ] Seed demo account and review the dashboard with it
+- [x] Seed demo account and review the dashboard with it (2026-11-14, local DB)
 - [ ] README screenshots grid
 - [ ] build-1000 report
 

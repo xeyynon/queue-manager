@@ -4,7 +4,7 @@ import { Button } from "@/components/Button";
 import { formatDuration } from "@/lib/format";
 import type { TokenDTO } from "@/lib/types";
 
-const time = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+const time = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
 const waited = (t: TokenDTO) => (t.servedAt ? (Date.parse(t.servedAt) - Date.parse(t.createdAt)) / 1000 : 0);
 
 export function NowServing({
@@ -35,7 +35,7 @@ export function NowServing({
               <p className="truncate text-lg font-medium">{current.label ?? <span className="text-ink-3">No name</span>}</p>
               <p className="text-sm text-ink-2">
                 called <span className="num">{current.servedAt ? time(current.servedAt) : "—"}</span> · waited{" "}
-                <span className="num">{formatDuration(waited(current))}</span>
+                <span className="tnum">{formatDuration(waited(current))}</span>
               </p>
             </div>
           </div>

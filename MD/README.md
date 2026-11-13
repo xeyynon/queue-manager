@@ -35,6 +35,7 @@ When documents disagree, trust the code first and `QueueManager_MASTER.md` secon
 - [system_design_and_boundary.md](system_design_and_boundary.md): layout, data flow, trust boundaries. Current
 - [api.md](api.md): every route, body, error. Current
 - [design_system.md](design_system.md): tokens, type, contrast results. Current
+- [ux_audit/](ux_audit/README.md): dated screenshot sets of every screen. Current
 
 ### Registers and logs
 - [decisions.md](decisions.md) · [bugs.md](bugs.md) · [bugfixed.md](bugfixed.md) · [tried_and_failed.md](tried_and_failed.md) · [tried_and_implemented.md](tried_and_implemented.md) · [pain.md](pain.md) · [rules.md](rules.md) · [cost.md](cost.md)

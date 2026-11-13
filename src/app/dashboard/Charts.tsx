@@ -7,9 +7,9 @@ import type { AnalyticsDTO } from "@/lib/types";
 // Chart colours are CSS variables, so light/dark switch with the theme (no literals).
 const AXIS = { stroke: "var(--ink-3)", fontSize: 12, tickLine: false, axisLine: false } as const;
 
-const timeOfDay = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+const timeOfDay = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
 const dayAndTime = (iso: string) =>
-  new Date(iso).toLocaleString([], { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  new Date(iso).toLocaleString([], { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
 
 type TipProps = { active?: boolean; label?: string | number; payload?: { name?: string; value?: number; color?: string }[] };
 
@@ -71,6 +71,17 @@ export function QueueLengthChart({ data }: { data: AnalyticsDTO }) {
       ? timeOfDay
       : (iso: string) => new Date(iso).toLocaleDateString([], { day: "numeric", month: "short" });
   const hasAny = data.queueLength.some((p) => p.peak > 0);
+  // Multi-day ranges: one tick per local midnight, so each date appears once.
+  const ticks =
+    data.range === "today"
+      ? undefined
+      : data.queueLength
+          .map((p) => p.t)
+          .filter((t) => {
+            const d = new Date(t);
+            return d.getHours() === 0 && d.getMinutes() === 0;
+          })
+          .filter((_, i, all) => data.range === "7d" || i % Math.ceil(all.length / 10) === 0);
   return (
     <>
       <div className="mt-4 h-64" role="img" aria-label={`Line chart of queue length, ${data.queueLength.length} points. Use "Show as table" for values.`}>
@@ -78,7 +89,7 @@ export function QueueLengthChart({ data }: { data: AnalyticsDTO }) {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data.queueLength} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
               <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
-              <XAxis dataKey="t" tickFormatter={tickFmt} minTickGap={40} {...AXIS} />
+              <XAxis dataKey="t" ticks={ticks} tickFormatter={tickFmt} minTickGap={ticks ? 4 : 40} {...AXIS} />
               <YAxis allowDecimals={false} {...AXIS} />
               <Tooltip
                 content={<Tip format={fmt} />}
@@ -112,7 +123,13 @@ export function QueueLengthChart({ data }: { data: AnalyticsDTO }) {
 
 export function ThroughputChart({ data }: { data: AnalyticsDTO }) {
   const label = (b: string) => bucketLabel(b, data.bucketUnit);
-  const tick = (b: string) => (data.bucketUnit === "hour" ? b.slice(11, 13) : bucketLabel(b, "day").split(",")[0]);
+  // Hours as "09"; a week as weekdays; a month as dates (weekdays repeat over 30 days).
+  const tick = (b: string) => {
+    if (data.bucketUnit === "hour") return b.slice(11, 13);
+    if (data.range === "7d") return bucketLabel(b, "day").split(",")[0];
+    const [y, m, d] = b.slice(0, 10).split("-").map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString([], { day: "numeric", month: "short" });
+  };
   const hasAny = data.throughput.some((r) => r.arrivals > 0 || r.served > 0);
   return (
     <>

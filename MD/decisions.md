@@ -1,7 +1,7 @@
 # Decisions
 
 Newest at the bottom. Never rewrite an entry: supersede it with a new one that names the old one.
-Latest: DEC-016
+Latest: DEC-021
 
 ## DEC-001 · Stack from the research phase (2026-11-13)
 Status: accepted
@@ -74,3 +74,20 @@ Why: validated with the dataviz `validate_palette.js` against #fff and #1b1c23 (
 
 ## DEC-016 · Fixed 15-minute "long wait" threshold (2026-11-14)
 Why: simple, explainable, shown as colour + the words "long wait". Revisit when: per-queue targets are requested.
+
+## DEC-017 · Local Docker Postgres for verification until Neon is set up (2026-11-14)
+Decision: container `qm-postgres` (Postgres 17, port 54329) with databases `qm_dev` and `qm_test`; `.env.local` points at it. Neon remains the dev/prod target (DEC-011).
+Chosen by: user ("throwaway Docker DB now").
+Revisit when: Neon strings arrive: swap `.env.local`, run `npm run db:migrate` and `npm run seed:demo` there.
+
+## DEC-018 · "Add token" ignores presses while an add is in flight (2026-11-14)
+Why: a double-click on Add token must not issue two tokens (same class of bug as double-serve). Pressing `A` twice deliberately works once the first token appears (~100 ms locally). Tested: e2e "double-clicking Add token issues one token, not two".
+
+## DEC-019 · E2E server turns the auth rate limit off (2026-11-14)
+Decision: `E2E_DISABLE_RATE_LIMIT=1` is set only by the web server in `playwright.config.ts`. Why: Better Auth limits sign-in/sign-up to 3 per 10 s per IP and the suite signs up a fresh manager per test. Production keeps it on.
+
+## DEC-020 · 24-hour times everywhere (2026-11-14)
+Why: matches the dashboard hour buckets ("09:00–10:00") and keeps timestamps from wrapping ("AM" on its own line, B-04).
+
+## DEC-021 · Durations use tabular Inter; monospace only for token numbers and clocks (2026-11-14)
+Why: "14 min" in mono next to Inter text looked broken (B-05); tabular figures still stop digits jittering.
