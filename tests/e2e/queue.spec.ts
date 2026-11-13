@@ -1,0 +1,135 @@
+import { expect, test, type Page } from "@playwright/test";
+
+// One fresh manager per test, so tests never depend on each other's data.
+async function signUp(page: Page) {
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  await page.goto("/login");
+  await page.getByRole("button", { name: "Create account" }).click();
+  await page.getByLabel("Your name").fill("Asha Test");
+  await page.getByLabel("Email").fill(`e2e-${id}@test.local`);
+  await page.getByLabel("Password").fill("correct-horse-42");
+  await page.locator("form").getByRole("button", { name: "Create account" }).click();
+  await expect(page).toHaveURL(/\/queues$/);
+}
+
+async function createQueue(page: Page, name: string) {
+  await page.getByLabel("Queue name").fill(name);
+  await page.getByRole("button", { name: "Create queue" }).click();
+  await expect(page.getByRole("heading", { level: 1, name })).toBeVisible();
+}
+
+async function addTokens(page: Page, labels: string[]) {
+  for (const l of labels) {
+    await page.getByLabel(/Name or note/).fill(l);
+    await page.getByRole("button", { name: /Add token/ }).click();
+    await expect(page.getByTestId("waiting-row").filter({ hasText: l })).toBeVisible();
+  }
+}
+
+const rowNumbers = (page: Page) => page.getByTestId("waiting-row").locator(".ticket").allTextContents();
+
+test("signed-out visitors are sent to the login page", async ({ page }) => {
+  await page.goto("/queues");
+  await expect(page).toHaveURL(/\/login/);
+});
+
+test("wrong password shows a clear error", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("nobody@test.local");
+  await page.getByLabel("Password").fill("wrong-password");
+  await page.locator("form").getByRole("button", { name: "Sign in" }).click();
+  await expect(page.getByRole("alert")).toContainText("don't match");
+});
+
+test("full queue flow: create, add, reorder, serve, cancel + undo, dashboard", async ({ page }) => {
+  await signUp(page);
+  await expect(page.getByText("No queues yet")).toBeVisible();
+
+  // R1/R2: create a named queue
+  await createQueue(page, "General OPD");
+  await expect(page.getByText("No one’s waiting")).toBeVisible();
+
+  // R3/R4: add tokens; they appear in order
+  await addTokens(page, ["Ravi", "Meena", "Arjun"]);
+  expect(await rowNumbers(page)).toEqual(["#1", "#2", "#3"]);
+
+  // R5: move #3 up, then #1 down
+  await page.getByRole("button", { name: "Move #3 up" }).click();
+  await expect.poll(() => rowNumbers(page)).toEqual(["#1", "#3", "#2"]);
+  await expect(page.getByTestId("waiting-row").filter({ hasText: "Arjun" })).toContainText("moved up");
+  await page.getByRole("button", { name: "Move #1 down" }).click();
+  await expect.poll(() => rowNumbers(page)).toEqual(["#3", "#1", "#2"]);
+
+  // Edge: first-up and last-down are disabled, not errors
+  await expect(page.getByRole("button", { name: "Move #3 up" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Move #2 down" })).toBeDisabled();
+
+  // R6: serve the top token with one click; a double-click must serve only one
+  await page.getByRole("button", { name: /Serve next/ }).dblclick();
+  await expect(page.getByRole("region", { name: "Now serving" })).toContainText("#3");
+  await page.reload();
+  expect(await rowNumbers(page)).toEqual(["#1", "#2"]);
+
+  // R7: cancel with undo
+  await page.getByRole("button", { name: "Cancel #2" }).click();
+  await expect.poll(() => rowNumbers(page)).toEqual(["#1"]);
+  await page.getByRole("button", { name: "Undo" }).click();
+  await expect.poll(() => rowNumbers(page)).toEqual(["#1", "#2"]);
+
+  // Audit log lists the actions
+  const log = page.getByRole("region", { name: "Activity" });
+  await expect(log).toContainText("moved up");
+  await expect(log).toContainText("put back (undo)");
+
+  // Serve everyone, then the button says why it's disabled
+  await page.getByRole("button", { name: /Serve next #1/ }).click();
+  await expect(page.getByRole("region", { name: "Now serving" })).toContainText("#1");
+  await page.getByRole("button", { name: /Serve next #2/ }).click();
+  await expect(page.getByRole("button", { name: "Serve next" })).toBeDisabled();
+  await expect(page.getByText("No one is waiting.")).toBeVisible();
+
+  // R8: dashboard reflects the activity
+  await page.getByRole("link", { name: "Dashboard" }).click();
+  const figures = page.getByRole("region", { name: "Key figures" });
+  await expect(figures).toContainText("Served");
+  await expect(figures.getByText("3", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Queue length" })).toBeVisible();
+  await page.getByRole("button", { name: "Last 7 days" }).click();
+  await expect(page).toHaveURL(/range=7d/);
+});
+
+test("keyboard shortcuts: A adds, S serves, ? opens help", async ({ page, isMobile }) => {
+  test.skip(isMobile, "keyboard shortcuts are a desktop feature");
+  await signUp(page);
+  await createQueue(page, "Keys");
+  await page.locator("body").click({ position: { x: 5, y: 300 } });
+  await page.keyboard.press("a");
+  await page.keyboard.press("a");
+  await expect(page.getByTestId("waiting-row")).toHaveCount(2);
+  await page.keyboard.press("s");
+  await expect(page.getByRole("region", { name: "Now serving" })).toContainText("#1");
+  await page.keyboard.press("?");
+  await expect(page.getByRole("dialog", { name: "Keyboard shortcuts" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toBeHidden();
+});
+
+test("duplicate queue names are rejected with a message", async ({ page }) => {
+  await signUp(page);
+  await createQueue(page, "Billing");
+  await page.goto("/queues");
+  await page.getByLabel("Queue name").fill("billing");
+  await page.getByRole("button", { name: "Create queue" }).click();
+  await expect(page.getByRole("alert")).toContainText("already have a queue");
+});
+
+test("another manager's queue is not reachable", async ({ page, browser }) => {
+  await signUp(page);
+  await createQueue(page, "Private");
+  const url = page.url();
+  const other = await browser.newPage();
+  await signUp(other);
+  await other.goto(url);
+  await expect(other.getByRole("heading", { name: "Not found" })).toBeVisible();
+  await other.close();
+});
