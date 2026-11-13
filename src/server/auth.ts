@@ -27,8 +27,10 @@ function buildAuth() {
       expiresIn: 60 * 60 * 24 * 7, // 7 days
       updateAge: 60 * 60 * 24, // refresh once a day of use
     },
-    // In-memory rate limit on auth endpoints (sign-in brute force).
-    rateLimit: { enabled: true, window: 60, max: 30 },
+    // In-memory rate limit on auth endpoints (sign-in brute force; Better Auth adds
+    // a stricter 3-per-10s rule on sign-in/sign-up). Only the E2E test server turns
+    // it off (playwright.config.ts), because the suite signs up many users per minute.
+    rateLimit: { enabled: process.env.E2E_DISABLE_RATE_LIMIT !== "1", window: 60, max: 30 },
     plugins: [nextCookies()],
   });
 }

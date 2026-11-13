@@ -27,6 +27,7 @@ export default defineConfig({
       DATABASE_URL: process.env.TEST_DATABASE_URL ?? "",
       BETTER_AUTH_URL: `http://localhost:${PORT}`,
       BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET ?? "",
+      E2E_DISABLE_RATE_LIMIT: "1",
     },
   },
 });

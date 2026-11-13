@@ -81,7 +81,7 @@ export function QueueList({ initial, serverNow }: { initial: QueueSummaryDTO[]; 
                 <li key={q.id}>
                   <Link
                     href={`/queues/${q.id}`}
-                    className="grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 px-4 py-4 hover:bg-surface-2 sm:grid-cols-[minmax(0,1fr)_110px_170px_120px]"
+                    className="grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 px-4 py-4 hover:bg-surface-2 sm:grid-cols-[minmax(0,1fr)_110px_220px_130px]"
                   >
                     <span className="min-w-0 truncate text-base font-semibold text-ink">{q.name}</span>
                     <span className="text-right sm:text-left">
@@ -93,7 +93,7 @@ export function QueueList({ initial, serverNow }: { initial: QueueSummaryDTO[]; 
                         <>
                           <IconClock />
                           <span>
-                            longest <span className="num">{formatDuration(longest)}</span>
+                            longest <span className="tnum">{formatDuration(longest)}</span>
                             {isLong ? " · long wait" : ""}
                           </span>
                         </>

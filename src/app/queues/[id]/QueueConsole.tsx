@@ -189,7 +189,7 @@ export function QueueConsole({ initial }: { initial: QueueStateDTO }) {
             <span className="text-sm font-normal text-ink-3">
               {interval !== null ? (
                 <>
-                  serving about every <span className="num">{Math.max(1, Math.round(interval / 60))} min</span>
+                  serving about every <span className="tnum">{Math.max(1, Math.round(interval / 60))} min</span>
                 </>
               ) : (
                 "estimates appear after 3 serves in 2 h"

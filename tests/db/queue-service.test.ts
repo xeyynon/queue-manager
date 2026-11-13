@@ -62,6 +62,24 @@ run("queue service (Postgres)", () => {
       expect(await listQueues(db, B)).toEqual([]);
     });
 
+    it("list shows each queue's own waiting count, longest wait and now-serving (B-01)", async () => {
+      const q1 = await createQueue(db, A, "One");
+      const q2 = await createQueue(db, A, "Two");
+      await addToken(db, A, q1.id, null);
+      await addToken(db, A, q1.id, null);
+      await addToken(db, A, q1.id, null);
+      await serveNext(db, A, q1.id);
+      await addToken(db, A, q2.id, null);
+      const list = await listQueues(db, A);
+      const one = list.find((q) => q.name === "One")!;
+      const two = list.find((q) => q.name === "Two")!;
+      expect(one.waiting).toBe(2);
+      expect(one.nowServingNumber).toBe(1);
+      expect(one.oldestWaitingSince).not.toBeNull();
+      expect(two.waiting).toBe(1);
+      expect(two.nowServingNumber).toBeNull();
+    });
+
     it("rejects a duplicate name for the same manager, ignoring case", async () => {
       await createQueue(db, A, "Billing");
       await expectCode(createQueue(db, A, "billing"), "DUPLICATE_NAME");
