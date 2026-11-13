@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/* Tokens. Every colour in the app is one of these; components never  */
+/* use literal colours (tests/unit/no-literal-colours.test.ts).        */
+/* Contrast ratios are measured by scripts/contrast.mjs (MD/design_system.md). */
+/* ------------------------------------------------------------------ */
+:root {
+  color-scheme: light;
+  --bg: #f4f3ef;          /* warm paper page */
+  --surface: #ffffff;     /* panels sit on the page by tone, not borders */
+  --surface-2: #ebe9e3;   /* recessed: inputs, hover rows, chart grid */
+  --ink: #1a1b22;
+  --ink-2: #4a4c57;       /* secondary text */
+  --ink-3: #5f6270;       /* meta text, still >= 4.5:1 on --bg */
+  --line: #d6d3cb;        /* only where a rule carries meaning (perforation, dividers in lists) */
+  --accent: #3a3eb3;      /* deep indigo: primary action, focus, active */
+  --accent-hover: #2e3196;
+  --on-accent: #ffffff;
+  --focus: #3a3eb3;
+  --warn-ink: #8a4b00;    /* "long wait" text */
+  --danger-ink: #b42318;  /* errors, destructive text */
+  --ok-ink: #1d6a43;      /* "served" text */
+  --chart-a: #2a78d6;     /* arrivals + queue length (validated: dataviz validate_palette, light vs #fff) */
+  --chart-b: #eb6834;     /* served */
+  --chart-line: #2a78d6;
+  --chart-grid: #e2e0d9;
+  --shadow-pop: 0 8px 24px -12px rgb(0 0 0 / 0.35); /* floating menus only; dark mode uses surface tone instead */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #121318;
+    --surface: #1b1c23;
+    --surface-2: #262731;
+    --ink: #ececf1;
+    --ink-2: #b4b6c2;
+    --ink-3: #9a9dab;
+    --line: #363744;
+    --accent: #8f93ff;
+    --accent-hover: #a7aaff;
+    --on-accent: #10112a;
+    --focus: #a7aaff;
+    --warn-ink: #f2b45c;
+    --danger-ink: #ff8f85;
+    --ok-ink: #72d3a3;
+    --chart-a: #3987e5;
+    --chart-b: #d95926;
+    --chart-line: #3987e5;
+    --chart-grid: #2b2c36;
+    --shadow-pop: 0 0 0 1px var(--line);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121318;
+  --surface: #1b1c23;
+  --surface-2: #262731;
+  --ink: #ececf1;
+  --ink-2: #b4b6c2;
+  --ink-3: #9a9dab;
+  --line: #363744;
+  --accent: #8f93ff;
+  --accent-hover: #a7aaff;
+  --on-accent: #10112a;
+  --focus: #a7aaff;
+  --warn-ink: #f2b45c;
+  --danger-ink: #ff8f85;
+  --ok-ink: #72d3a3;
+  --chart-a: #3987e5;
+  --chart-b: #d95926;
+  --chart-line: #3987e5;
+  --chart-grid: #2b2c36;
+  --shadow-pop: 0 0 0 1px var(--line);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --color-warn-ink: var(--warn-ink);
+  --color-danger-ink: var(--danger-ink);
+  --color-ok-ink: var(--ok-ink);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  caret-color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Every number, id and time uses tabular figures so live timers don't jitter. */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Ticket stub: the token number's mark. The dashed edge is the tear line of a
+   paper token, the one decorative device in the app. */
+.ticket {
+  position: relative;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+}
+.ticket::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  right: 0;
+  border-right: 2px dashed var(--line);
+}
+
+button:active:not([aria-busy="true"]):not(:disabled) {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+  button:active:not(:disabled) {
+    transform: none;
+  }
+}
