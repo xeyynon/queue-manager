@@ -1,7 +1,7 @@
 # Decisions
 
 Newest at the bottom. Never rewrite an entry: supersede it with a new one that names the old one.
-Latest: DEC-028
+Latest: DEC-029
 
 ## DEC-001 · Stack from the research phase (2026-11-13)
 Status: accepted
@@ -119,3 +119,8 @@ Why: the user wants every push to update the live site; deploying from the pipel
 Secrets (repo): TEST_DATABASE_URL, PROD_DATABASE_URL, VERCEL_ORG_ID, VERCEL_PROJECT_ID, VERCEL_TOKEN, set by the owner with `scripts/setup-github-secrets.sh` (Claude may not send DB credentials to GitHub).
 Does NOT claim: zero-downtime for destructive migrations; keep migrations backward-compatible.
 Revisit when: PR preview deployments are wanted (needs a Neon branch per PR and a preview auth URL).
+
+## DEC-029 · Node 24 everywhere the app runs (2026-11-14)
+Decision: `package.json` `engines.node = "24.x"`; all CI jobs use Node 24. Vercel reads `engines` for the function runtime.
+Why: the new Vercel project defaulted to Node 26.x, which Vercel CLI 60.1.3 (used for `vercel build` in CI) rejects; Node 24 is the LTS Vercel recommends in that error, and tests should run on the runtime production uses. Local dev on Node 20 still works (Next needs >= 20.9) with an npm engine warning.
+Revisit when: upgrading the local machine to Node 24 (removes the warning) or moving CI to a newer Vercel CLI.

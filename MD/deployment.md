@@ -4,7 +4,7 @@ Last verified: 2026-11-14.
 
 | Piece | Where | Notes |
 |---|---|---|
-| App | Vercel project `queue-manager` (team surya-pratiks-projects), functions in `sin1` | Live: https://queue-manager-bice.vercel.app |
+| App | Vercel project `queue-manager` (team surya-pratiks-projects), functions in `sin1`, Node 24 (DEC-029) | Live: https://queue-manager-bice.vercel.app |
 | Database | Neon project `queue-manager` (curly-dust-57177870), `aws-ap-southeast-1` | branches: `main` (prod), `dev` (local), `test` (tests) |
 
 ## Production environment variables (Vercel, production, all "Hidden Secret")
@@ -28,3 +28,6 @@ After a deploy, optional visual check: `node scripts/screenshots.mjs https://que
 
 ## Measured (2026-11-14, from India, curl)
 `/login` 200 in 0.67–0.81 s (3 requests). Signed-out `/queues` → 307 to `/login`; `/api/queues` → 401.
+
+## Pipeline first run (2026-11-14, run 43582824234)
+check + test passed. Deploy failed three times, each a setup problem: (1) and (2) Vercel token could see the project but not the team (`vercel pull` → "Could not retrieve Project Settings"); fixed with a team-scoped token, and `scripts/setup-github-secrets.sh` now verifies team + project before saving. (3) `vercel build` rejected the project default Node 26.x; fixed by DEC-029.
