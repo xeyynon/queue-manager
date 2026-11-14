@@ -44,6 +44,10 @@ When documents disagree, trust the code first and `QueueManager_MASTER.md` secon
 - [research_and_decision_log.md](research_and_decision_log.md): Phase 1 research + stack validation + UI plan (2026-11-13), with all sources. Current (§6 "Next steps" is superseded by tasks.md)
 - [external_research.md](external_research.md)
 
+### Operations
+- [deployment.md](deployment.md): where it runs, env vars, deploy + migrate steps, pre-evaluation checklist. Current
+- [cost.md](cost.md)
+
 ### Process
 - [version_control.md](version_control.md) · [builds/](builds/) · [session_handover_2026-11-14.md](session_handover_2026-11-14.md)
 

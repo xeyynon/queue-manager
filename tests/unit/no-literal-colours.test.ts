@@ -25,7 +25,7 @@ describe("no literal colours in components", () => {
     const offenders = readFileSync(file, "utf8")
       .split("\n")
       .map((line, i) => ({ line, n: i + 1 }))
-      .filter(({ line }) => !line.trim().startsWith("//") && (LITERAL.test(line) || TW_PALETTE.test(line)))
+      .filter(({ line }) => !/^(\/\/|\/?\*)/.test(line.trim()) && (LITERAL.test(line) || TW_PALETTE.test(line)))
       .map(({ line, n }) => `${n}: ${line.trim()}`);
     expect(offenders).toEqual([]);
   });

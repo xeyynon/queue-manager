@@ -9,21 +9,20 @@ A web app where a queue manager (receptionist / counter staff) creates named que
 | Area | State | Where |
 |---|---|---|
 | Research + stack validation | done (2026-11-13) | [research_and_decision_log.md](research_and_decision_log.md) |
-| DB schema + migration | applied to local Docker Postgres (DEC-017); not yet on Neon | `src/db/schema.ts`, `drizzle/0000_init.sql` |
+| DB schema + migration | applied on Neon `main`, `dev`, `test` (DEC-022) | `src/db/schema.ts`, `drizzle/0000_init.sql` |
 | Auth (email + password) | **verified** in browser + E2E (sign up, sign in, wrong password); session-expiry redirect untested | `src/server/auth.ts`, `src/app/login/` |
 | Queue service (R1-R7) | **verified**: 25 DB tests pass (2026-11-14) | `src/server/queue-service.ts`, `tests/db/` |
 | Analytics (R8) | **verified**: DB tests + dashboard screenshots with 30 days of demo data | `src/server/analytics-service.ts` |
 | API routes | written, build passes | `src/app/api/` |
 | UI: login, queues, queue console, dashboard | **verified**: 42 screenshots (4 widths × 2 themes), no console errors, no overflow | `src/app/`, `MD/ux_audit/2026-11-14/` |
 | Unit tests | 95 passing (2026-11-14) | `tests/unit/` |
-| E2E tests | **13 pass** + 1 skipped by design, desktop + phone (2026-11-14) | `tests/e2e/` |
+| E2E tests | **13 pass** twice against Neon `test`, server UTC + browser IST, console errors fail the run (2026-11-14) | `tests/e2e/` |
 | Contrast check | all pairs pass both themes (2026-11-14) | `scripts/contrast.mjs` |
-| Demo seed | run on local DB: 3 queues, ~6.5k tokens over 30 days | `scripts/seed-demo.ts` |
-| Deploy | not started | Vercel + Neon |
+| Demo seed | seeded on Neon `main` (production) and `dev` (2026-11-14); ages, so re-seed before evaluation | `scripts/seed-demo.ts` |
+| Deploy | **live** https://queue-manager-bice.vercel.app (Vercel sin1 + Neon Singapore); signed-in screenshot run clean. Auto-deploy pipeline written (DEC-028), waiting for GitHub secrets | `vercel.json`, `.github/workflows/ci.yml`, [deployment.md](deployment.md) |
 
-Latest build: none tagged yet (next: build-1000) · Live at: not deployed · Repo: **private** since 2026-11-14 (user's choice), https://github.com/xeyynon/queue-manager. MD/ is committed (DEC-012). Must be made public, or evaluators added as collaborators, before submission. CI green on first push (2026-11-14, run 43508843681; DB tests skipped, no secret yet)
-
-**Running on:** local Docker Postgres (DEC-017). **Next blocker:** Neon strings for deploy. See [open_questions.md](open_questions.md).
+Latest build: none tagged yet (next: build-1000) · Live at: https://queue-manager-bice.vercel.app · 
+**Running on:** Neon (dev branch locally, main in production). Local Docker DB (DEC-017) no longer used.
 
 ## Roles / users
 - **Queue manager** (desktop at a counter, sometimes a phone/tablet; English UI): runs one or more queues, adds/moves/serves/cancels tokens, checks the dashboard.

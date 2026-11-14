@@ -1,7 +1,7 @@
 # Decisions
 
 Newest at the bottom. Never rewrite an entry: supersede it with a new one that names the old one.
-Latest: DEC-021
+Latest: DEC-028
 
 ## DEC-001 · Stack from the research phase (2026-11-13)
 Status: accepted
@@ -91,3 +91,31 @@ Why: matches the dashboard hour buckets ("09:00–10:00") and keeps timestamps f
 
 ## DEC-021 · Durations use tabular Inter; monospace only for token numbers and clocks (2026-11-14)
 Why: "14 min" in mono next to Inter text looked broken (B-05); tabular figures still stop digits jittering.
+
+## DEC-022 · Neon project, branches and region (2026-11-14)
+Decision: Neon project `queue-manager` (curly-dust-57177870) in org SURYA (org-twilight-dew-78709812), region `aws-ap-southeast-1` (Singapore). Branches: `main` = production (Vercel), `dev` = local `DATABASE_URL`, `test` = `TEST_DATABASE_URL` (tests truncate it). Pooled URLs everywhere. Folder linked with `neon link` (`.neon`, gitignored); `--no-env-pull` so existing `.env.local` keys were kept.
+Why: closest Neon region to India; branch-per-purpose as the Neon skill recommends; supersedes the local Docker DB of DEC-017 (container left running, unused).
+Chosen by: user (personal org); region by Claude.
+
+## DEC-023 · Vercel functions in Singapore, framework pinned (2026-11-14)
+Decision: `vercel.json` sets `"framework": "nextjs"` and `"regions": ["sin1"]`. Why: next to the Neon region; the project was created with `vercel project add`, which doesn't detect the framework (first deploy failed looking for `public/`).
+
+## DEC-024 · Auth base URL falls back to Vercel's production domain (2026-11-14)
+Decision: `baseURL = BETTER_AUTH_URL ?? https://$VERCEL_PROJECT_PRODUCTION_URL`. Why: no redeploy needed to learn the domain. Preview deployments are not supported for sign-in (different origin).
+
+## DEC-025 · Clock times render after hydration (2026-11-14)
+Decision: all clock times in server-rendered components use `<LocalTime>`; placeholder "--:--" during SSR. Why: B-08. The server cannot know the viewer's zone.
+
+## DEC-026 · Double-click protection by time window, not by in-flight lock (2026-11-14)
+Supersedes DEC-018. Decision: a press within 600 ms of the previous one is the same press; anything later is queued. Why: B-10 (in-flight locks swallowed deliberate presses once real latency existed). Server-side expectedTokenId keeps "never serve two" independent of the client.
+
+## DEC-027 · Neon agent tooling in the repo (2026-11-14)
+Decision: project-level Neon MCP server via OAuth (`.mcp.json`, URL only, no key) and project-level skills `neon` + `neon-postgres` in `.claude/skills/` (locked in `skills-lock.json`). Installed with `neon` CLI 9.5.0 (global npm `neonctl`, user-approved) and the `skills` installer 1.8.1 run once under a temporary Node 22 (`npx -p node@22`); system Node stays 20.
+Why: user asked to follow Neon's skill. Only the skills relevant to this app (Postgres) were installed; Neon Auth/Functions/Storage are not used (Better Auth stays, per the skill's own guidance).
+
+## DEC-028 · Deploy from the GitHub Actions pipeline on every push to main (2026-11-14)
+Decision: `.github/workflows/ci.yml` runs check (typecheck, lint, unit, contrast, build) → test (DB tests + Playwright E2E on Neon `test`) → deploy (drizzle migrate on Neon `main`, then `vercel pull/build/deploy --prebuilt --prod`, then a smoke test). Pull requests stop after test. One run at a time (shared `test` branch).
+Why: the user wants every push to update the live site; deploying from the pipeline means a failing test blocks the release and migrations run before new code goes live. Vercel's own Git integration was rejected: it would deploy even when tests fail and does not migrate the database.
+Secrets (repo): TEST_DATABASE_URL, PROD_DATABASE_URL, VERCEL_ORG_ID, VERCEL_PROJECT_ID, VERCEL_TOKEN, set by the owner with `scripts/setup-github-secrets.sh` (Claude may not send DB credentials to GitHub).
+Does NOT claim: zero-downtime for destructive migrations; keep migrations backward-compatible.
+Revisit when: PR preview deployments are wanted (needs a Neon branch per PR and a preview auth URL).

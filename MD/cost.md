@@ -5,7 +5,7 @@ What this project pays for, the guardrails in place, the switches that trade cos
 ## Providers and billing units
 | Provider | Used for | Billed by (unit) | Plan / credit | Alert set? | Hard cap set? | Key scoped to this app? |
 |---|---|---|---|---|---|---|
-| Neon | Postgres | CU-hours (100/project/month free), storage (1 GB/project free) | Free, no card | [ ] | n/a (free plan stops at quota) | [x] own project |
+| Neon | Postgres (project queue-manager, 3 branches) | CU-hours (100/project/month free), storage (1 GB/project free) | Free, no card | [ ] | n/a (free plan stops at quota) | [x] own project |
 | Vercel | app hosting | function invocations / GB-hours, bandwidth | Hobby (free) | [ ] | n/a | n/a |
 
 ## Day-one checklist
@@ -14,7 +14,7 @@ What this project pays for, the guardrails in place, the switches that trade cos
 - [x] No paid APIs
 - [x] Polling only while the tab is visible (`usePolling`)
 - [x] Idle DB pool connections close after 10 s (`idleTimeoutMillis`)
-- [ ] Vercel deployment protection checked (evaluator can open the URL)
+- [x] Vercel deployment protection checked: production URL opens signed-out (curl 200, 2026-11-14)
 
 ## Switches (cost vs speed)
 | Switch | Where it lives | Current | How to flip (e.g. demo day) |
