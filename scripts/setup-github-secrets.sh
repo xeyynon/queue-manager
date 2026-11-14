@@ -27,11 +27,31 @@ put PROD_DATABASE_URL "$(conn main)"
 put VERCEL_ORG_ID "$(node -p 'require("./.vercel/project.json").orgId')"
 put VERCEL_PROJECT_ID "$(node -p 'require("./.vercel/project.json").projectId')"
 
-if gh secret list | grep -q '^VERCEL_TOKEN'; then
-  echo "VERCEL_TOKEN: already set (left unchanged)"
+# Vercel token. Re-run with --replace-token to swap a bad or expired one.
+if gh secret list | grep -q '^VERCEL_TOKEN' && [ "${1:-}" != "--replace-token" ]; then
+  echo "VERCEL_TOKEN: already set (left unchanged; run with --replace-token to change it)"
 else
   read -r -s -p "Paste a Vercel access token (input hidden): " token
   echo
+  # Windows terminals can paste a trailing carriage return; strip all whitespace.
+  token="$(printf '%s' "$token" | tr -d '[:space:]')"
+  org="$(node -p 'require("./.vercel/project.json").orgId')"
+  project="$(node -p 'require("./.vercel/project.json").projectId')"
+  # The Vercel CLI reads BOTH the team and the project before it deploys, and stops
+  # with "Could not retrieve Project Settings" if either is forbidden. Check both
+  # before saving (prints only HTTP status codes).
+  check() { curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $token" "$1"; }
+  s_team="$(check "https://api.vercel.com/v2/teams/$org")"
+  s_project="$(check "https://api.vercel.com/v9/projects/$project?teamId=$org")"
+  echo "Vercel check: team HTTP $s_team, project HTTP $s_project"
+  if [ "$s_team" != "200" ] || [ "$s_project" != "200" ]; then
+    echo "VERCEL_TOKEN: NOT saved." >&2
+    echo "  The token must reach the whole team, not only one project. Create a new token at" >&2
+    echo "  https://vercel.com/account/tokens with scope \"Surya Pratik's projects\" (the team itself," >&2
+    echo "  no project restriction), then re-run with --replace-token." >&2
+    exit 1
+  fi
+  echo "VERCEL_TOKEN: verified for team and project queue-manager"
   put VERCEL_TOKEN "$token"
 fi
 
