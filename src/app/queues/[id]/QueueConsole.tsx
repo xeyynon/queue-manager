@@ -9,6 +9,7 @@ import { useNow } from "@/hooks/useNow";
 import { api } from "@/lib/api";
 import { serviceIntervalSeconds } from "@/lib/estimate";
 import { applyCancel, applyMove, applyRestore, applyServe } from "@/lib/optimistic";
+import { createPressGuard } from "@/lib/press-guard";
 import type { QueueStateDTO, TokenDTO } from "@/lib/types";
 import { TOKEN_LABEL_MAX } from "@/lib/validation";
 import { ActivityLog } from "./ActivityLog";
@@ -23,10 +24,9 @@ export function QueueConsole({ initial }: { initial: QueueStateDTO }) {
   const { state, mutate, refresh, lastSync, offline, clockOffset } = useQueueState(queueId, initial);
   const now = useNow(clockOffset, Date.parse(initial.serverNow));
   const [label, setLabel] = useState("");
-  const [adding, setAdding] = useState(false);
-  const [serving, setServing] = useState(false);
-  const servingRef = useRef(false);
-  const addingRef = useRef(false);
+  // One guard per action: a double-click is one press; a later press is queued (B-10).
+  const [acceptAdd] = useState(() => createPressGuard());
+  const [acceptServe] = useState(() => createPressGuard());
   const labelRef = useRef<HTMLInputElement>(null);
   const helpRef = useRef<HTMLDialogElement>(null);
   const base = `/api/queues/${queueId}`;
@@ -36,10 +36,11 @@ export function QueueConsole({ initial }: { initial: QueueStateDTO }) {
   const top = state.waiting[0] ?? null;
 
   const addToken = useCallback(async () => {
-    if (addingRef.current) return;
-    addingRef.current = true;
-    setAdding(true);
+    if (!acceptAdd(Date.now())) return;
+    // Take the name now and clear the field, so the next person can be typed in
+    // while this add is still on its way. Put it back if the add fails.
     const text = label;
+    setLabel("");
     const ok = await mutate({
       request: () => api<{ token: TokenDTO }>(`${base}/tokens`, { method: "POST", body: { label: text } }),
       onSuccess: (r) => {
@@ -47,27 +48,23 @@ export function QueueConsole({ initial }: { initial: QueueStateDTO }) {
         toast.success(`Token #${t.number} added${t.label ? ` for ${t.label}` : ""}`);
       },
     });
-    if (ok) setLabel("");
-    addingRef.current = false;
-    setAdding(false);
-  }, [base, label, mutate]);
+    if (!ok && text) setLabel((cur) => (cur === "" ? text : cur));
+  }, [acceptAdd, base, label, mutate]);
 
-  const serveNext = useCallback(async () => {
-    // Busy guard: a double-click sends one request. The server also checks
-    // expectedTokenId, so even two tabs can't serve two people at once.
-    if (servingRef.current || !top) return;
-    servingRef.current = true;
-    setServing(true);
+  const serveNext = useCallback(() => {
+    // A double-click is one press (press guard). A later press serves whoever is
+    // now on top of the (optimistic) list, queued behind the previous request.
+    // The server serves only if that token is still on top (expectedTokenId),
+    // so even two tabs can't serve two people at once.
+    if (!top || !acceptServe(Date.now())) return;
     const expected = top;
-    await mutate({
+    void mutate({
       optimistic: (s) => applyServe(s, nowIso()),
       request: () => api(`${base}/serve`, { method: "POST", body: { expectedTokenId: expected.id } }),
       onSuccess: () => toast(`Now serving #${expected.number}${expected.label ? ` · ${expected.label}` : ""}`),
     });
-    servingRef.current = false;
-    setServing(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [base, mutate, top, clockOffset]);
+  }, [acceptServe, base, mutate, top, clockOffset]);
 
   const move = useCallback(
     (t: TokenDTO, direction: "up" | "down") =>
@@ -178,9 +175,9 @@ export function QueueConsole({ initial }: { initial: QueueStateDTO }) {
                 className="h-10 w-full min-w-0 rounded-md bg-surface-2 px-3 text-ink placeholder:text-ink-3 outline-none focus-visible:outline-2 focus-visible:outline-accent pointer-coarse:h-11"
               />
             </div>
-            <Button type="submit" variant="secondary" busy={adding} aria-keyshortcuts="a" className="shrink-0">
+            <Button type="submit" variant="secondary" aria-keyshortcuts="a" className="shrink-0">
               <IconPlus />
-              {adding ? "Adding…" : "Add token"}
+              Add token
             </Button>
           </form>
 
@@ -208,7 +205,7 @@ export function QueueConsole({ initial }: { initial: QueueStateDTO }) {
         </section>
 
         <aside className="flex flex-col gap-6 lg:sticky lg:top-18 lg:self-start">
-          <NowServing current={state.nowServing} recent={state.recentServed} next={top} serving={serving} onServe={serveNext} />
+          <NowServing current={state.nowServing} recent={state.recentServed} next={top} onServe={serveNext} />
           <ActivityLog events={state.events} />
         </aside>
       </div>

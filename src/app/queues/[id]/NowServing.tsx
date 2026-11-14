@@ -1,23 +1,21 @@
 "use client";
 
 import { Button } from "@/components/Button";
+import { LocalTime } from "@/components/LocalTime";
 import { formatDuration } from "@/lib/format";
 import type { TokenDTO } from "@/lib/types";
 
-const time = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
 const waited = (t: TokenDTO) => (t.servedAt ? (Date.parse(t.servedAt) - Date.parse(t.createdAt)) / 1000 : 0);
 
 export function NowServing({
   current,
   recent,
   next,
-  serving,
   onServe,
 }: {
   current: TokenDTO | null;
   recent: TokenDTO[];
   next: TokenDTO | null;
-  serving: boolean;
   onServe: () => void;
 }) {
   return (
@@ -34,7 +32,7 @@ export function NowServing({
             <div className="min-w-0">
               <p className="truncate text-lg font-medium">{current.label ?? <span className="text-ink-3">No name</span>}</p>
               <p className="text-sm text-ink-2">
-                called <span className="num">{current.servedAt ? time(current.servedAt) : "—"}</span> · waited{" "}
+                called {current.servedAt ? <LocalTime iso={current.servedAt} /> : "—"} · waited{" "}
                 <span className="tnum">{formatDuration(waited(current))}</span>
               </p>
             </div>
@@ -50,7 +48,6 @@ export function NowServing({
           variant="primary"
           size="xl"
           className="w-full"
-          busy={serving}
           disabled={!next}
           aria-keyshortcuts="s"
           aria-describedby={!next ? "serve-reason" : undefined}
@@ -77,7 +74,7 @@ export function NowServing({
           <ul className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-2">
             {recent.map((t) => (
               <li key={t.id}>
-                <span className="num text-ink">#{t.number}</span> <span className="num">{t.servedAt ? time(t.servedAt) : ""}</span>
+                <span className="num text-ink">#{t.number}</span> {t.servedAt ? <LocalTime iso={t.servedAt} /> : null}
               </li>
             ))}
           </ul>

@@ -1,5 +1,19 @@
 import { expect, test, type Page } from "@playwright/test";
 
+// Any console error or uncaught exception fails the test (hydration mismatches included).
+let consoleErrors: string[] = [];
+test.beforeEach(({ page }) => {
+  consoleErrors = [];
+  page.on("console", (m) => {
+    if (m.type() === "error") consoleErrors.push(m.text());
+  });
+  page.on("pageerror", (e) => consoleErrors.push(String(e)));
+});
+test.afterEach(() => {
+  // The wrong-password test expects one 401 from the auth endpoint; network 4xx are not app errors.
+  expect(consoleErrors.filter((t) => !/Failed to load resource: the server responded with a status of 4\d\d/.test(t))).toEqual([]);
+});
+
 // One fresh manager per test, so tests never depend on each other's data.
 async function signUp(page: Page) {
   const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -67,6 +81,8 @@ test("full queue flow: create, add, reorder, serve, cancel + undo, dashboard", a
   // R6: serve the top token with one click; a double-click must serve only one
   await page.getByRole("button", { name: /Serve next/ }).dblclick();
   await expect(page.getByRole("region", { name: "Now serving" })).toContainText("#3");
+  // The panel updates optimistically; the toast appears only once the server confirmed.
+  await expect(page.getByText(/^Now serving #3 · Arjun$/)).toBeVisible();
   await page.reload();
   expect(await rowNumbers(page)).toEqual(["#1", "#2"]);
 
@@ -84,9 +100,11 @@ test("full queue flow: create, add, reorder, serve, cancel + undo, dashboard", a
   // Serve everyone, then the button says why it's disabled
   await page.getByRole("button", { name: /Serve next #1/ }).click();
   await expect(page.getByRole("region", { name: "Now serving" })).toContainText("#1");
+  await expect(page.getByText(/^Now serving #1 · Ravi$/)).toBeVisible(); // server confirmed
   await page.getByRole("button", { name: /Serve next #2/ }).click();
   await expect(page.getByRole("button", { name: "Serve next" })).toBeDisabled();
   await expect(page.getByText("No one is waiting.")).toBeVisible();
+  await expect(page.getByText(/^Now serving #2 · Meena$/)).toBeVisible(); // server confirmed
 
   // R8: dashboard reflects the activity
   await page.getByRole("link", { name: "Dashboard" }).click();

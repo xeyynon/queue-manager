@@ -2,7 +2,7 @@
 
 A token queue system for walk-in counters (clinic, bank, office). A manager signs in, creates named queues, issues tokens, reorders them, serves the top token with one click, cancels with undo, and reads wait-time analytics.
 
-> Live demo: _not deployed yet_ · Demo login: shown on the login page once the demo account is seeded (its history is **simulated** and labelled "Sample data" on every screen).
+> **Live:** https://queue-manager-bice.vercel.app · Use **"Fill in the demo login"** on the sign-in page to explore 30 days of **simulated** sample data (labelled on every screen), or create your own empty account.
 
 ## Requirements → where they live
 
@@ -46,6 +46,8 @@ Optional demo account with 30 days of simulated history: set `DEMO_EMAIL` and `D
 | `npm run test:db` | service tests against a real Postgres (needs `TEST_DATABASE_URL`, a separate branch: it wipes data) |
 | `npm run test:e2e` | Playwright on desktop and phone viewports, against the test database |
 | `node scripts/contrast.mjs` | WCAG contrast of every colour-token pair, light and dark |
+
+Every push to `main` runs all of the above in GitHub Actions, then migrates the production database and deploys to Vercel; a failing test stops the release ([MD/deployment.md](MD/deployment.md)).
 
 ## Project layout
 ```

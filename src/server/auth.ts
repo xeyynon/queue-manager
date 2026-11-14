@@ -6,8 +6,17 @@ import { headers } from "next/headers";
 import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
 
+// Public URL of the app. Locally: BETTER_AUTH_URL from .env.local. On Vercel, if
+// BETTER_AUTH_URL isn't set, use the production domain Vercel exposes at runtime.
+function baseURL(): string | undefined {
+  if (process.env.BETTER_AUTH_URL) return process.env.BETTER_AUTH_URL;
+  const prod = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  return prod ? `https://${prod}` : undefined;
+}
+
 function buildAuth() {
   return betterAuth({
+    baseURL: baseURL(),
     database: drizzleAdapter(getDb(), {
       provider: "pg",
       schema: {

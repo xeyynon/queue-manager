@@ -13,7 +13,8 @@ export default defineConfig({
   fullyParallel: false,
   retries: 0,
   reporter: [["list"]],
-  use: { baseURL: `http://localhost:${PORT}`, trace: "retain-on-failure" },
+  // Browser in IST, server in UTC (like Vercel): hydration bugs from time zones show up here (B-08).
+  use: { baseURL: `http://localhost:${PORT}`, trace: "retain-on-failure", timezoneId: "Asia/Kolkata" },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
     { name: "phone", use: { ...devices["Pixel 7"] } },
@@ -28,6 +29,7 @@ export default defineConfig({
       BETTER_AUTH_URL: `http://localhost:${PORT}`,
       BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET ?? "",
       E2E_DISABLE_RATE_LIMIT: "1",
+      TZ: "UTC",
     },
   },
 });

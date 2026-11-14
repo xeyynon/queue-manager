@@ -36,6 +36,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <Toaster
           position="bottom-center"
+          // Below 1024px "Serve next" is docked to the bottom; keep toasts above it (B-11).
+          offset={{ bottom: 104 }}
+          mobileOffset={{ bottom: 104 }}
           toastOptions={{
             classNames: {
               toast: "!bg-ink !text-bg !rounded-md !shadow-none !font-sans !border-0",

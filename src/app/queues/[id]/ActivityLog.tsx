@@ -1,5 +1,6 @@
 "use client";
 
+import { LocalTime } from "@/components/LocalTime";
 import type { EventDTO } from "@/lib/types";
 
 const VERB: Record<EventDTO["type"], string> = {
@@ -11,7 +12,6 @@ const VERB: Record<EventDTO["type"], string> = {
   restored: "put back (undo)",
 };
 
-const time = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" });
 
 /** The audit trail: every add, reorder, serve and cancel, with who and when. */
 export function ActivityLog({ events }: { events: EventDTO[] }) {
@@ -26,7 +26,7 @@ export function ActivityLog({ events }: { events: EventDTO[] }) {
         <ol className="mt-2 max-h-80 space-y-1.5 overflow-y-auto pr-1 text-sm">
           {events.map((e) => (
             <li key={e.id} className="grid grid-cols-[72px_minmax(0,1fr)] gap-2">
-              <span className="num text-ink-3">{time(e.at)}</span>
+              <LocalTime iso={e.at} seconds className="num text-ink-3" />
               <span className="min-w-0 text-ink-2">
                 <span className="num font-medium text-ink">#{e.tokenNumber ?? "?"}</span> {VERB[e.type]}
                 {e.actorName ? <span className="text-ink-3"> · {e.actorName}</span> : null}

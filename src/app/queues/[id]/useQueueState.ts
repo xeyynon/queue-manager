@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { usePolling } from "@/hooks/usePolling";
 import { api, ApiFailure } from "@/lib/api";
@@ -58,6 +58,17 @@ export function useQueueState(queueId: string, initial: QueueStateDTO) {
   );
 
   usePolling(() => void refresh(), 5000);
+
+  // B-09: the screen shows a change before the server has it (optimistic). If the
+  // manager reloads or closes the tab while a change is still being sent, the
+  // browser asks first, so a serve shown on screen is never silently dropped.
+  useEffect(() => {
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      if (pending.current > 0) e.preventDefault();
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, []);
 
   const mutate = useCallback(
     (m: Mutation): Promise<boolean> => {
