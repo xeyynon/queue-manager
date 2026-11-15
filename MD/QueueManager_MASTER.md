@@ -14,12 +14,12 @@ A web app where a queue manager (receptionist / counter staff) creates named que
 | Queue service (R1-R7) | **verified**: 25 DB tests pass (2026-11-14) | `src/server/queue-service.ts`, `tests/db/` |
 | Analytics (R8) | **verified**: DB tests + dashboard screenshots with 30 days of demo data | `src/server/analytics-service.ts` |
 | API routes | written, build passes | `src/app/api/` |
-| UI: login, queues, queue console, dashboard | **verified**: 42 screenshots (4 widths × 2 themes), no console errors, no overflow | `src/app/`, `MD/ux_audit/2026-11-14/` |
-| Unit tests | 95 passing (2026-11-14) | `tests/unit/` |
+| UI: login, queues, queue console, dashboard | **verified**: 42 screenshots (4 widths × 2 themes), no console errors, no overflow. UI/UX audit 2026-11-15: 14 findings fixed on branch `ux-audit-fixes` (not merged to main) | `src/app/`, `MD/ux_audit/2026-11-15-audit.md` |
+| Unit tests | 177 passing (2026-11-15; guard tests run once per source file) | `tests/unit/` |
 | E2E tests | **13 pass** twice against Neon `test`, server UTC + browser IST, console errors fail the run (2026-11-14) | `tests/e2e/` |
 | Contrast check | all pairs pass both themes (2026-11-14) | `scripts/contrast.mjs` |
 | Demo seed | seeded on Neon `main` (production) and `dev` (2026-11-14); ages, so re-seed before evaluation | `scripts/seed-demo.ts` |
-| Deploy | **live** https://queue-manager-bice.vercel.app (Vercel sin1 + Neon Singapore); signed-in screenshot run clean. Auto-deploy pipeline written (DEC-028), waiting for GitHub secrets | `vercel.json`, `.github/workflows/ci.yml`, [deployment.md](deployment.md) |
+| Deploy | **live** https://queue-manager-bice.vercel.app (Vercel sin1 + Neon Singapore); signed-in screenshot run clean. **every push to main deploys** after check + tests pass (DEC-028, verified 2026-11-14) | `vercel.json`, `.github/workflows/ci.yml`, [deployment.md](deployment.md) |
 
 Latest build: none tagged yet (next: build-1000) · Live at: https://queue-manager-bice.vercel.app · 
 **Running on:** Neon (dev branch locally, main in production). Local Docker DB (DEC-017) no longer used.

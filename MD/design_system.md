@@ -21,11 +21,15 @@ A calm counter tool for a busy front desk. Warm paper page, white panels separat
 | `--accent` | primary button, focus ring, active nav underline, links |
 | `--warn-ink` | "long wait" text (always with clock icon + words) |
 | `--danger-ink` | errors and the cancel ✕ |
+| `--field-line` | 1px edge of every input/select (≥3:1, WCAG 1.4.11; guard `tests/unit/field-edges.test.ts`) |
 | `--ok-ink` | reserved for "served" text |
 | `--chart-a/-b/-line` | chart series only (DEC-015) |
 
 ## Contrast (measured 2026-11-14, `node scripts/contrast.mjs`)
 All 24 pairs pass in both themes. Lowest text pairs: light `--ink-3` on `--surface-2` 4.99:1; dark `--ink-3` on `--surface-2` 5.49:1. Lowest graphic: light `--chart-b` on `--surface` 3.20:1 (min 3).
+
+## Focus
+When an action removes or re-orders the focused control, focus moves to its replacement (next row's ✕, the moved token's arrow, or the empty state's button). E2E "keyboard focus stays on the list after move and cancel".
 
 ## Motion
 Press feedback `scale(.97)` only; no entrance animations on high-frequency actions (serve/add/move happen hundreds of times a day). `prefers-reduced-motion` removes it.

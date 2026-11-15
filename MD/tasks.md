@@ -22,13 +22,16 @@ When you tick something, add the date and the build or InBul that carried it.
 - [x] Neon project + dev/test/main branches, migrated, demo seeded on main + dev (2026-11-14, DEC-022)
 - [x] Deployed: https://queue-manager-bice.vercel.app (2026-11-14, DEC-023/024); production screenshot run clean
 - [x] Fixed B-08…B-11 found against Neon/production (2026-11-14, uncommitted)
-- [x] Pipeline deploys on push to main (DEC-028) — written 2026-11-14, not yet run
-- [ ] **User:** run `bash scripts/setup-github-secrets.sh` (needs a Vercel token)
-- [ ] Commit + push (first automatic deploy) — when the user asks
+- [x] Pipeline deploys on push to main (DEC-028) — verified 2026-11-14, run 43584822144 (e975158)
+- [x] GitHub secrets set by the user (2026-11-14), team-scoped Vercel token
+- [x] First automatic deploy (2026-11-14)
 - [ ] Re-seed demo on `main` right before the evaluation (demo "waiting" times age otherwise)
 - [ ] Make the repo public / add evaluators before submission
 
 ## P1
+- [x] UI/UX audit: 14 findings (A-01…A-14) fixed, plus 2 found while checking (2026-11-15, branch `ux-audit-fixes`, `MD/ux_audit/2026-11-15-audit.md`)
+- [ ] Merge `ux-audit-fixes` to main (deploys), then write `MD/builds/build-1000.md` and tag `build-1000`
+- [ ] Answer audit questions Q-1 (long-wait threshold per queue), Q-2 (`A` shortcut adds at once), Q-3 (show "Now" in the phone's docked bar)
 - [x] Seed demo account and review the dashboard with it (2026-11-14, local DB)
 - [ ] README screenshots grid
 - [ ] build-1000 report

@@ -37,6 +37,7 @@ const PAIRS = [
   ["bg", "ink", 4.5], // toasts: page colour on ink
   ["chart-a", "surface", 3], ["chart-b", "surface", 3], ["chart-line", "surface", 3],
   ["focus", "bg", 3], ["focus", "surface", 3],
+  ["field-line", "bg", 3], ["field-line", "surface", 3], ["field-line", "surface-2", 3], // input edges (WCAG 1.4.11)
 ];
 
 let failed = 0;

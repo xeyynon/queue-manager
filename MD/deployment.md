@@ -31,3 +31,4 @@ After a deploy, optional visual check: `node scripts/screenshots.mjs https://que
 
 ## Pipeline first run (2026-11-14, run 43582824234)
 check + test passed. Deploy failed three times, each a setup problem: (1) and (2) Vercel token could see the project but not the team (`vercel pull` → "Could not retrieve Project Settings"); fixed with a team-scoped token, and `scripts/setup-github-secrets.sh` now verifies team + project before saving. (3) `vercel build` rejected the project default Node 26.x; fixed by DEC-029.
+(4) Run 43584822144 for commit e975158: check, test and deploy all passed; production deployment Ready, `/login` 200 in 0.61 s. **Push-to-deploy verified 2026-11-14.**

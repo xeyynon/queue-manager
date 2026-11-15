@@ -14,6 +14,7 @@
   --ink-2: #4a4c57;       /* secondary text */
   --ink-3: #5f6270;       /* meta text, still >= 4.5:1 on --bg */
   --line: #d6d3cb;        /* only where a rule carries meaning (perforation, dividers in lists) */
+  --field-line: #85827a;  /* input/select edge: >= 3:1 on bg, surface and surface-2 (WCAG 1.4.11) */
   --accent: #3a3eb3;      /* deep indigo: primary action, focus, active */
   --accent-hover: #2e3196;
   --on-accent: #ffffff;
@@ -38,6 +39,7 @@
     --ink-2: #b4b6c2;
     --ink-3: #9a9dab;
     --line: #363744;
+    --field-line: #737584;
     --accent: #8f93ff;
     --accent-hover: #a7aaff;
     --on-accent: #10112a;
@@ -62,6 +64,7 @@
   --ink-2: #b4b6c2;
   --ink-3: #9a9dab;
   --line: #363744;
+  --field-line: #737584;
   --accent: #8f93ff;
   --accent-hover: #a7aaff;
   --on-accent: #10112a;
@@ -84,6 +87,7 @@
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
   --color-line: var(--line);
+  --color-field-line: var(--field-line);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-on-accent: var(--on-accent);

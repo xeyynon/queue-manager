@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import { usePolling } from "@/hooks/usePolling";
 import { api, ApiFailure } from "@/lib/api";
-import { bucketLabel, formatDuration, formatPercent } from "@/lib/format";
+import { bucketLabel, formatCount, formatDuration, formatPercent } from "@/lib/format";
 import type { AnalyticsDTO } from "@/lib/types";
 import type { Range } from "@/lib/validation";
 import { QueueLengthChart, ThroughputChart } from "./Charts";
@@ -99,7 +99,7 @@ export function Dashboard({
               setLoading(true);
               setQueue(e.target.value);
             }}
-            className="h-9 max-w-64 rounded-md bg-surface-2 px-2 text-ink outline-none focus-visible:outline-2 focus-visible:outline-accent pointer-coarse:h-11"
+            className="h-9 max-w-64 rounded-md border border-field-line bg-surface-2 px-2 text-ink outline-none focus-visible:outline-2 focus-visible:outline-accent pointer-coarse:h-11"
           >
             <option value="all">All queues</option>
             {queues.map((q) => (
@@ -144,7 +144,7 @@ export function Dashboard({
         <div className={`mt-6 grid gap-6 transition-opacity ${loading ? "opacity-60" : ""}`}>
           {/* Headline figures: one strip, four numbers that answer "how are we doing?" */}
           <section aria-label="Key figures" className="grid grid-cols-2 gap-x-6 gap-y-6 rounded-md bg-surface p-5 md:grid-cols-4">
-            <Figure label="Waiting now" value={String(data.waitingNow)} note="across selected queues" />
+            <Figure label="Waiting now" value={formatCount(data.waitingNow)} note="across selected queues" />
             <Figure
               label="Average wait"
               value={data.avgWaitSec !== null ? formatDuration(data.avgWaitSec) : "—"}
@@ -152,8 +152,8 @@ export function Dashboard({
                 data.avgWaitSec === null
                   ? `no one served ${rangeLabel}`
                   : enough && data.medianWaitSec !== null
-                    ? `median ${formatDuration(data.medianWaitSec)} · ${data.served} served`
-                    : `${data.served} served`
+                    ? `median ${formatDuration(data.medianWaitSec)} · ${formatCount(data.served)} served`
+                    : `${formatCount(data.served)} served`
               }
             />
             <Figure
@@ -163,11 +163,11 @@ export function Dashboard({
             />
             <Figure
               label="Served"
-              value={String(data.served)}
+              value={formatCount(data.served)}
               note={
                 data.cancellationRate === null
-                  ? `${data.arrivals} arrived`
-                  : `${data.arrivals} arrived · ${data.cancelled} cancelled (${formatPercent(data.cancellationRate)})`
+                  ? `${formatCount(data.arrivals)} arrived`
+                  : `${formatCount(data.arrivals)} arrived · ${formatCount(data.cancelled)} cancelled (${formatPercent(data.cancellationRate)})`
               }
             />
           </section>
@@ -181,7 +181,9 @@ export function Dashboard({
               {data.queueLengthBucketMinutes === 1440
                 ? "day"
                 : data.queueLengthBucketMinutes >= 60
-                  ? `${data.queueLengthBucketMinutes / 60} h`
+                  ? data.queueLengthBucketMinutes === 60
+                    ? "hour"
+                    : `${data.queueLengthBucketMinutes / 60} h`
                   : `${data.queueLengthBucketMinutes} min`}
             </p>
             <QueueLengthChart data={data} />

@@ -16,7 +16,7 @@
 5. Push only when told: `git push origin main --tags`.
 
 ## Branches
-main only for now (single developer). Parallel sessions use separate worktrees.
+main only for now (single developer). Parallel sessions use separate worktrees. Exception at the owner's request: `ux-audit-fixes` (2026-11-15); tag the build when it reaches main, not on the branch.
 
 ## This repo
 - `scripts/changelog.mjs` from the playbook flow is **not set up yet**; until it is, write `MD/builds/build-N.md` by hand and tag with `git tag build-N`.

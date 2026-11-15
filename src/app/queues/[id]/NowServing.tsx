@@ -4,6 +4,7 @@ import { Button } from "@/components/Button";
 import { LocalTime } from "@/components/LocalTime";
 import { formatDuration } from "@/lib/format";
 import type { TokenDTO } from "@/lib/types";
+import { NoName } from "./WaitingList";
 
 const waited = (t: TokenDTO) => (t.servedAt ? (Date.parse(t.servedAt) - Date.parse(t.createdAt)) / 1000 : 0);
 
@@ -30,10 +31,12 @@ export function NowServing({
               #{current.number}
             </span>
             <div className="min-w-0">
-              <p className="truncate text-lg font-medium">{current.label ?? <span className="text-ink-3">No name</span>}</p>
+              <p className="truncate text-lg font-medium">{current.label ?? <NoName />}</p>
               <p className="text-sm text-ink-2">
-                called {current.servedAt ? <LocalTime iso={current.servedAt} /> : "—"} · waited{" "}
-                <span className="tnum">{formatDuration(waited(current))}</span>
+                <span className="whitespace-nowrap">called {current.servedAt ? <LocalTime iso={current.servedAt} /> : "—"}</span> ·{" "}
+                <span className="whitespace-nowrap">
+                  waited <span className="tnum">{formatDuration(waited(current))}</span>
+                </span>
               </p>
             </div>
           </div>

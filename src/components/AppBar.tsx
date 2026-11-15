@@ -63,12 +63,16 @@ export function AppBar({
   }
 
   return (
-    <header className="sticky top-0 z-20 bg-bg">
+    <>
+      {/* Outside the sticky header: it is read once and scrolls away, so on a phone it
+          doesn't sit on top of the queue all day (audit A-06). Flat strip, no inverted band. */}
       {isDemo ? (
-        <p className="bg-ink px-4 py-1.5 text-center text-sm text-bg">
-          Sample data: this demo account&rsquo;s history is simulated. Sign up for an empty account to use it for real.
+        <p className="bg-surface-2 px-4 py-1.5 text-center text-sm text-ink-2">
+          <strong className="font-semibold text-ink">Sample data:</strong> this demo account&rsquo;s history is simulated.
+          <span className="hidden sm:inline"> Sign up for an empty account to use it for real.</span>
         </p>
       ) : null}
+    <header className="sticky top-0 z-20 bg-bg">
       <div className="mx-auto grid h-14 max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4">
         <Link href="/queues" className="justify-self-start text-[15px] font-semibold tracking-tight text-ink">
           Queue&nbsp;Manager
@@ -127,5 +131,6 @@ export function AppBar({
         </div>
       </div>
     </header>
+    </>
   );
 }
