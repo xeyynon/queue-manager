@@ -23,14 +23,18 @@ export function LoginForm({ demo }: { demo: { email: string; password: string } 
     setError(null);
     if (mode === "signup" && name.trim() === "") return setError("Enter your name.");
     if (mode === "signup" && password.length < 8) return setError("Use at least 8 characters for the password.");
+    await run(mode, email.trim(), password);
+  }
+
+  async function run(m: Mode, mail: string, pass: string) {
     setBusy(true);
     const res =
-      mode === "signin"
-        ? await authClient.signIn.email({ email: email.trim(), password })
-        : await authClient.signUp.email({ email: email.trim(), password, name: name.trim() });
+      m === "signin"
+        ? await authClient.signIn.email({ email: mail, password: pass })
+        : await authClient.signUp.email({ email: mail, password: pass, name: name.trim() });
     if (res.error) {
       setBusy(false);
-      setError(friendly(res.error.code, res.error.message, mode));
+      setError(friendly(res.error.code, res.error.message, m));
       return;
     }
     router.replace("/queues");
@@ -101,18 +105,22 @@ export function LoginForm({ demo }: { demo: { email: string; password: string } 
           <p>
             Evaluating? A demo account has sample queues and 30 days of <strong className="font-semibold text-ink">sample data</strong>.
           </p>
-          <button
-            type="button"
-            className="mt-2 font-medium text-accent underline hover:text-accent-hover"
+          {/* One click for evaluators: fills the form (so they see what was used) and signs in. */}
+          <Button
+            variant="secondary"
+            className="mt-3 w-full"
+            disabled={busy}
             onClick={() => {
+              if (busy) return;
               setMode("signin");
               setEmail(demo.email);
               setPassword(demo.password);
               setError(null);
+              void run("signin", demo.email, demo.password);
             }}
           >
-            Fill in the demo login
-          </button>
+            Sign in to the demo account
+          </Button>
         </div>
       ) : null}
     </div>

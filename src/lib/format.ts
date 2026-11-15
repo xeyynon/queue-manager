@@ -28,6 +28,11 @@ export function formatEstimate(seconds: number | null): string {
   return `~${Math.floor(mins / 60)} h ${String(mins % 60).padStart(2, "0")} min`;
 }
 
+/** Whole counts with Indian digit grouping, fixed locale so server and browser agree: 6501 → "6,501", 150000 → "1,50,000". */
+export function formatCount(n: number): string {
+  return Number.isFinite(n) ? Math.round(n).toLocaleString("en-IN") : "—";
+}
+
 export function formatPercent(ratio: number | null): string {
   if (ratio === null) return "—";
   return `${Math.round(ratio * 100)}%`;

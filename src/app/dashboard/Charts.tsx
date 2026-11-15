@@ -72,9 +72,15 @@ export function QueueLengthChart({ data }: { data: AnalyticsDTO }) {
       : (iso: string) => new Date(iso).toLocaleDateString([], { day: "numeric", month: "short" });
   const hasAny = data.queueLength.some((p) => p.peak > 0);
   // Multi-day ranges: one tick per local midnight, so each date appears once.
+  // Today: ticks on whole hours, every 3 h (not wherever the first bucket happens to fall).
   const ticks =
     data.range === "today"
-      ? undefined
+      ? data.queueLength
+          .map((p) => p.t)
+          .filter((t) => {
+            const d = new Date(t);
+            return d.getMinutes() === 0 && d.getHours() % 3 === 0;
+          })
       : data.queueLength
           .map((p) => p.t)
           .filter((t) => {

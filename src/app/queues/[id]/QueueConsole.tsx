@@ -145,7 +145,7 @@ export function QueueConsole({ initial }: { initial: QueueStateDTO }) {
               </>
             )}
           </p>
-          <Button variant="ghost" size="sm" onClick={() => helpRef.current?.showModal()} aria-keyshortcuts="?">
+          <Button variant="ghost" size="sm" className="pointer-coarse:hidden" onClick={() => helpRef.current?.showModal()} aria-keyshortcuts="?">
             Shortcuts
           </Button>
           <QueueSettings queueId={queueId} name={state.queue.name} waiting={state.waiting.length} onRenamed={() => void refresh(true)} />
@@ -172,7 +172,7 @@ export function QueueConsole({ initial }: { initial: QueueStateDTO }) {
                 maxLength={TOKEN_LABEL_MAX}
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="e.g. Ravi K, wheelchair"
-                className="h-10 w-full min-w-0 rounded-md bg-surface-2 px-3 text-ink placeholder:text-ink-3 outline-none focus-visible:outline-2 focus-visible:outline-accent pointer-coarse:h-11"
+                className="h-10 w-full min-w-0 rounded-md border border-field-line bg-surface-2 px-3 text-ink placeholder:text-ink-3 outline-none focus-visible:outline-2 focus-visible:outline-accent pointer-coarse:h-11"
               />
             </div>
             <Button type="submit" variant="secondary" aria-keyshortcuts="a" className="shrink-0">
