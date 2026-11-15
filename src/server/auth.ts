@@ -63,7 +63,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   const result = await getAuth().api.getSession({ headers: h });
   if (!result) return null;
   const { id, name, email } = result.user;
-  // The demo account holds simulated history; every screen says so (DEC-010).
+  // The demo account holds simulated history; every screen says so.
   const isDemo = !!process.env.DEMO_EMAIL && email.toLowerCase() === process.env.DEMO_EMAIL.toLowerCase();
   return { id, name, email, isDemo };
 }

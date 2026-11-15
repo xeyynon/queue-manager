@@ -5,7 +5,7 @@ import { mkdirSync, readFileSync } from "node:fs";
 import { chromium } from "@playwright/test";
 
 const BASE = process.argv[2] ?? "http://localhost:3000";
-const OUT = process.argv[3] ?? "MD/ux_audit/2026-11-14";
+const OUT = process.argv[3] ?? "screenshots-out";
 const env = Object.fromEntries(
   readFileSync(".env.local", "utf8")
     .split("\n")

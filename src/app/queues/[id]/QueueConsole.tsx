@@ -24,7 +24,7 @@ export function QueueConsole({ initial }: { initial: QueueStateDTO }) {
   const { state, mutate, refresh, lastSync, offline, clockOffset } = useQueueState(queueId, initial);
   const now = useNow(clockOffset, Date.parse(initial.serverNow));
   const [label, setLabel] = useState("");
-  // One guard per action: a double-click is one press; a later press is queued (B-10).
+  // One guard per action: a double-click is one press; a later press is queued.
   const [acceptAdd] = useState(() => createPressGuard());
   const [acceptServe] = useState(() => createPressGuard());
   const labelRef = useRef<HTMLInputElement>(null);

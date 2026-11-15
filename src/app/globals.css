@@ -3,7 +3,7 @@
 /* ------------------------------------------------------------------ */
 /* Tokens. Every colour in the app is one of these; components never  */
 /* use literal colours (tests/unit/no-literal-colours.test.ts).        */
-/* Contrast ratios are measured by scripts/contrast.mjs (MD/design_system.md). */
+/* Contrast ratios are measured by scripts/contrast.mjs. */
 /* ------------------------------------------------------------------ */
 :root {
   color-scheme: light;

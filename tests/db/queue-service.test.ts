@@ -30,7 +30,7 @@ const B = "manager-b";
 
 // The concurrency tests fire 12-20 requests at once; each locks the queue row, so they run
 // one after another, every one a multi-round-trip transaction. From GitHub runners to Neon
-// Singapore the moves test took 26.4 s (run 43732585061) and timed out at 30 s twice (B-12).
+// Singapore the moves test took 26.4 s (run 43732585061) and timed out at 30 s twice.
 const CONCURRENCY_TIMEOUT = 90_000;
 
 async function expectCode(p: Promise<unknown>, code: string) {
@@ -67,7 +67,7 @@ run("queue service (Postgres)", () => {
       expect(await listQueues(db, B)).toEqual([]);
     });
 
-    it("list shows each queue's own waiting count, longest wait and now-serving (B-01)", async () => {
+    it("list shows each queue's own waiting count, longest wait and now-serving", async () => {
       const q1 = await createQueue(db, A, "One");
       const q2 = await createQueue(db, A, "Two");
       await addToken(db, A, q1.id, null);

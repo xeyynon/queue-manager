@@ -2,7 +2,6 @@ name: CI / Deploy
 
 # Every push to main: check → test → migrate production DB → deploy to Vercel.
 # Pull requests: check → test only. Deploy runs only when every test passed.
-# See MD/deployment.md (DEC-028).
 
 on:
   push:

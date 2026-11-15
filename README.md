@@ -74,10 +74,10 @@ Retake them all with `npm run build && npx next start`, then `node scripts/scree
 - **Honest numbers.** Estimated waits use Little's Law on the recent serving pace and show "—" until there are 3 serves in the last 2 hours; percentiles need 5 served.
 - **Audit trail.** Every add, move, serve, cancel and undo is logged with who and when, and shown on the queue screen.
 - **Feels instant.** Optimistic updates with rollback; requests sent in click order; undo instead of "are you sure?".
-- **Accessible and readable.** Status is never colour alone (clock icon + "long wait" + colour); every colour pair is measured against WCAG in both themes, including the edges of form fields; keyboard focus stays in the list after a move or cancel (E2E-tested); 44 px touch targets on phones; charts have a "Show as table" view. Audit with before/after images: [MD/ux_audit/2026-11-15-audit.md](MD/ux_audit/2026-11-15-audit.md).
+- **Accessible and readable.** Status is never colour alone (clock icon + "long wait" + colour); every colour pair is measured against WCAG in both themes, including the edges of form fields; keyboard focus stays in the list after a move or cancel (E2E-tested); 44 px touch targets on phones; charts have a "Show as table" view.
 
 ## Stack
-Next.js 16 (App Router, TypeScript) · PostgreSQL (Neon) · Drizzle ORM · Better Auth · Tailwind CSS 4 · Recharts · Zod · Vitest · Playwright · Vercel. Every choice is reasoned with sources in [MD/research_and_decision_log.md](MD/research_and_decision_log.md) and [MD/decisions.md](MD/decisions.md).
+Next.js 16 (App Router, TypeScript) · PostgreSQL (Neon) · Drizzle ORM · Better Auth · Tailwind CSS 4 · Recharts · Zod · Vitest · Playwright · Vercel. Each choice was compared against alternatives before building (for example Drizzle over Prisma for native `SELECT … FOR UPDATE`, and Better Auth over the now-maintenance-mode Auth.js).
 
 ## Run it locally
 Requires Node 20+ and a Postgres database (a free [Neon](https://neon.com) project works).
@@ -99,7 +99,7 @@ Optional demo account with 30 days of simulated history: set `DEMO_EMAIL` and `D
 | `npm run test:e2e` | Playwright on desktop and phone viewports, against the test database |
 | `node scripts/contrast.mjs` | WCAG contrast of every colour-token pair, light and dark |
 
-Every push to `main` runs all of the above in GitHub Actions, then migrates the production database and deploys to Vercel; a failing test stops the release ([MD/deployment.md](MD/deployment.md)).
+Every push to `main` runs all of the above in GitHub Actions, then migrates the production database and deploys to Vercel; a failing test stops the release.
 
 ## Project layout
 ```
@@ -108,7 +108,6 @@ src/server/         auth, queue-service (all rules + locking), analytics-service
 src/lib/            pure logic shared by client and server (estimates, formatting, optimistic updates)
 src/db/             Drizzle schema + client · drizzle/ SQL migrations
 tests/unit|db|e2e   pure logic · real Postgres · real browser
-MD/                 project memory: research, decisions, API, design system, tasks
 ```
 
 ## Known gaps

@@ -18,7 +18,7 @@ export function useHydrated(): boolean {
  *
  * The server can't know the viewer's zone (Vercel runs in UTC), so formatting a
  * time while server-rendering produced UTC text and a hydration mismatch
- * (B-08, React error 418). This renders a neutral placeholder on the server and the
+ * (React error 418). This renders a neutral placeholder on the server and the
  * real local time right after hydration. Use it for every clock time in a
  * server-rendered component (guarded by tests/unit/no-ssr-time-format.test.ts).
  */

@@ -3,7 +3,7 @@
  *
  * λ (serves per second) is measured over the most recent serves inside the last
  * two hours. With fewer than MIN_SERVES serves there is no honest rate, so the
- * estimate is null and the UI shows "—" instead of a made-up number (DEC-007).
+ * estimate is null and the UI shows "—" instead of a made-up number.
  */
 export const MIN_SERVES = 3;
 export const RATE_WINDOW_MS = 2 * 60 * 60 * 1000;

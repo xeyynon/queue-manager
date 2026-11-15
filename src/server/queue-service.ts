@@ -39,7 +39,7 @@ function isUniqueViolation(err: unknown): boolean {
 
 // Drizzle renders ${queues.id} as a bare "id" in a single-table select, which
 // inside a correlated subquery resolves to the *subquery's* table (tokens.id).
-// Always reference the outer row fully qualified. (B-01)
+// Always reference the outer row fully qualified.
 const OUTER_QUEUE_ID = sql.raw(`"queues"."id"`);
 
 export async function listQueues(db: Db, ownerId: string): Promise<QueueSummaryDTO[]> {
@@ -171,7 +171,7 @@ export async function deleteQueue(db: Db, ownerId: string, queueId: string) {
 /* Mutations. Each one runs in a transaction that first locks the      */
 /* queue row (SELECT ... FOR UPDATE). That serialises every change to  */
 /* one queue: two "Serve next" clicks, or a move racing a serve, run   */
-/* one after the other instead of interleaving. See DEC-005.           */
+/* one after the other instead of interleaving.                       */
 /* ------------------------------------------------------------------ */
 
 async function lockOwnedQueue(tx: Tx, ownerId: string, queueId: string) {

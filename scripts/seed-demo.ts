@@ -1,7 +1,7 @@
 /**
  * Seeds the DEMO account with 30 days of SIMULATED history, so an evaluator
  * can see the dashboard with data. Every screen of this account shows a
- * "Sample data" notice (MD/decisions.md DEC-010). Real accounts are never touched.
+ * "Sample data" notice. Real accounts are never touched.
  *
  *   npm run seed:demo      (reads DATABASE_URL, DEMO_EMAIL, DEMO_PASSWORD from .env.local)
  *

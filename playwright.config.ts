@@ -13,7 +13,7 @@ export default defineConfig({
   fullyParallel: false,
   retries: 0,
   reporter: [["list"]],
-  // Browser in IST, server in UTC (like Vercel): hydration bugs from time zones show up here (B-08).
+  // Browser in IST, server in UTC (like Vercel): hydration bugs from time zones show up here.
   use: { baseURL: `http://localhost:${PORT}`, trace: "retain-on-failure", timezoneId: "Asia/Kolkata" },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },

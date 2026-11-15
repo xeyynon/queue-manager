@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
-// B-08: formatting a clock time while server-rendering uses the server's zone
+// Formatting a clock time while server-rendering uses the server's zone
 // (UTC on Vercel) and breaks hydration for viewers elsewhere. Clock times in
 // server-rendered components go through <LocalTime>. Files listed here format
 // dates only after a client-side fetch (nothing to format during SSR), or build

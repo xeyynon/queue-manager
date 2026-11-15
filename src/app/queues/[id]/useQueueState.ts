@@ -59,7 +59,7 @@ export function useQueueState(queueId: string, initial: QueueStateDTO) {
 
   usePolling(() => void refresh(), 5000);
 
-  // B-09: the screen shows a change before the server has it (optimistic). If the
+  // The screen shows a change before the server has it (optimistic). If the
   // manager reloads or closes the tab while a change is still being sent, the
   // browser asks first, so a serve shown on screen is never silently dropped.
   useEffect(() => {

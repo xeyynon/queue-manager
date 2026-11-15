@@ -1,5 +1,5 @@
 /**
- * Double-click protection that doesn't swallow deliberate presses (B-10).
+ * Double-click protection that doesn't swallow deliberate presses.
  * A press within `windowMs` of the previous accepted press is treated as the
  * same press (a double-click, a bounced key). Anything later is a new action,
  * even if the previous request is still in flight: it is queued, not dropped.

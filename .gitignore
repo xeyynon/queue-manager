@@ -48,3 +48,12 @@ next-env.d.ts
 .neon
 
 .vercel
+
+# Private project notes and AI-agent tooling: kept locally, never committed
+/MD/
+/CLAUDE.md
+/AGENTS.md
+/.claude/
+/.mcp.json
+/skills-lock.json
+/screenshots-out/
