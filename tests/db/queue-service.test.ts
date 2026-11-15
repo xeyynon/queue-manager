@@ -28,6 +28,11 @@ let pool: Pool;
 const A = "manager-a";
 const B = "manager-b";
 
+// The concurrency tests fire 12-20 requests at once; each locks the queue row, so they run
+// one after another, every one a multi-round-trip transaction. From GitHub runners to Neon
+// Singapore the moves test took 26.4 s (run 43732585061) and timed out at 30 s twice (B-12).
+const CONCURRENCY_TIMEOUT = 90_000;
+
 async function expectCode(p: Promise<unknown>, code: string) {
   const err = await p.then(
     () => null,
@@ -115,7 +120,7 @@ run("queue service (Postgres)", () => {
       const added = await Promise.all(Array.from({ length: 20 }, () => addToken(db, A, q.id, null)));
       const nums = added.map((t) => t.number).sort((a, b) => a - b);
       expect(nums).toEqual(Array.from({ length: 20 }, (_, i) => i + 1));
-    });
+    }, CONCURRENCY_TIMEOUT);
 
     it("never reuses a cancelled token's number", async () => {
       const q = await createQueue(db, A, "Q");
@@ -177,7 +182,7 @@ run("queue service (Postgres)", () => {
       await Promise.all(ts.flatMap((t) => [moveToken(db, A, q.id, t.id, "up"), moveToken(db, A, q.id, t.id, "down")]));
       const after = await numbers(q.id);
       expect([...after].sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5, 6]);
-    });
+    }, CONCURRENCY_TIMEOUT);
   });
 
   describe("R6 · serve the top token", () => {
@@ -216,7 +221,7 @@ run("queue service (Postgres)", () => {
       expect(served.sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5]);
       const empty = results.filter((r) => r.status === "rejected" && (r.reason as AppError).code === "EMPTY_QUEUE");
       expect(empty).toHaveLength(3);
-    });
+    }, CONCURRENCY_TIMEOUT);
 
     it("serves in the order after reordering", async () => {
       const q = await createQueue(db, A, "Q");
