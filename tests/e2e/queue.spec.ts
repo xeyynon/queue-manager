@@ -133,6 +133,31 @@ test("keyboard shortcuts: A adds, S serves, ? opens help", async ({ page, isMobi
   await expect(page.getByRole("dialog")).toBeHidden();
 });
 
+// Audit A-03 (2026-11-15): a row re-ordered or removed under the focused button used to drop focus to <body>.
+test("keyboard focus stays on the list after move and cancel", async ({ page, isMobile }) => {
+  test.skip(isMobile, "keyboard focus is a desktop concern");
+  await signUp(page);
+  await createQueue(page, "Focus");
+  await addTokens(page, ["Ann", "Bob", "Cy"]);
+  const focused = () => page.evaluate(() => document.activeElement?.getAttribute("aria-label") ?? document.activeElement?.tagName);
+
+  await page.getByRole("button", { name: "Move #1 down" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("waiting-row").first()).toContainText("Bob");
+  expect(await focused()).toBe("Move #1 down");
+
+  await page.getByRole("button", { name: "Cancel #2" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("waiting-row")).toHaveCount(2);
+  expect(await focused()).toBe("Cancel #1");
+
+  await page.keyboard.press("Enter");
+  await page.getByRole("button", { name: "Cancel #3" }).press("Enter");
+  await expect(page.getByTestId("waiting-row")).toHaveCount(0);
+  expect(await focused()).toBe("BUTTON"); // "Add the first token" (no aria-label)
+  await expect(page.getByRole("button", { name: "Add the first token" })).toBeFocused();
+});
+
 test("double-clicking Add token issues one token, not two", async ({ page }) => {
   await signUp(page);
   await createQueue(page, "Guard");

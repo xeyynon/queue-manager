@@ -20,7 +20,7 @@ export function TextField({ label, error, hint, hideLabel, id, className = "", .
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
         className={[
-          "h-10 w-full min-w-0 rounded-md bg-surface-2 px-3 text-ink placeholder:text-ink-3",
+          "h-10 w-full min-w-0 rounded-md border border-field-line bg-surface-2 px-3 text-ink placeholder:text-ink-3",
           "outline-none focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-accent pointer-coarse:h-11",
           error ? "outline-2 outline-danger-ink" : "",
         ].join(" ")}

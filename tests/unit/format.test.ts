@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { bucketLabel, formatClock, formatDuration, formatEstimate, formatPercent } from "@/lib/format";
+import { bucketLabel, formatClock, formatCount, formatDuration, formatEstimate, formatPercent } from "@/lib/format";
 
 describe("formatDuration", () => {
   it.each([
@@ -47,5 +47,15 @@ describe("bucketLabel", () => {
   });
   it("labels day buckets with the calendar date (no time-zone shift)", () => {
     expect(bucketLabel("2026-11-14T00:00", "day")).toMatch(/14/);
+  });
+});
+
+describe("formatCount", () => {
+  it("groups digits the Indian way and rounds", () => {
+    expect(formatCount(0)).toBe("0");
+    expect(formatCount(1454)).toBe("1,454");
+    expect(formatCount(150000)).toBe("1,50,000");
+    expect(formatCount(12.6)).toBe("13");
+    expect(formatCount(Number.NaN)).toBe("—");
   });
 });

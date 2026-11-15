@@ -1,5 +1,6 @@
 "use client";
 
+import { useLayoutEffect, useRef } from "react";
 import { Button } from "@/components/Button";
 import { IconClock, IconDown, IconPlus, IconUp, IconX } from "@/components/Icons";
 import { estimateWaitSeconds } from "@/lib/estimate";
@@ -16,7 +17,48 @@ type Props = {
   onAddFirst: () => void;
 };
 
+/** An unnamed token: a quiet dash on screen, words for screen readers. */
+export function NoName() {
+  return (
+    <span className="font-normal text-ink-3">
+      <span aria-hidden>—</span>
+      <span className="sr-only">No name</span>
+    </span>
+  );
+}
+
 export function WaitingList({ tokens, now, interval, lastServeAt, onMove, onCancel, onAddFirst }: Props) {
+  // A cancelled row unmounts at once (optimistic), taking the focused ✕ with it.
+  // Move focus to the ✕ now at that position, else the empty state's button (UI-78).
+  // A move re-orders the rows, which also drops focus: follow the moved token, on the
+  // same arrow, or the other one if that arrow is now disabled (it reached the end).
+  const refocusAt = useRef<number | null>(null);
+  const refocusMove = useRef<{ id: string; d: "up" | "down" } | null>(null);
+  useLayoutEffect(() => {
+    const i = refocusAt.current;
+    const m = refocusMove.current;
+    refocusAt.current = null;
+    refocusMove.current = null;
+    if (i !== null) {
+      const buttons = document.querySelectorAll<HTMLElement>("[data-cancel-token]");
+      const target = buttons[Math.min(i, buttons.length - 1)] ?? document.querySelector<HTMLElement>("[data-add-first]");
+      target?.focus();
+    } else if (m) {
+      const row = document.querySelector(`[data-token-row="${m.id}"]`);
+      const same = row?.querySelector<HTMLButtonElement>(`[data-move="${m.d}"]`);
+      const other = row?.querySelector<HTMLButtonElement>(`[data-move="${m.d === "up" ? "down" : "up"}"]`);
+      (same && !same.disabled ? same : other)?.focus();
+    }
+  }, [tokens]);
+  const cancelAt = (t: TokenDTO, i: number) => {
+    refocusAt.current = i;
+    onCancel(t);
+  };
+  const moveTo = (t: TokenDTO, d: "up" | "down") => {
+    refocusMove.current = { id: t.id, d };
+    onMove(t, d);
+  };
+
   if (tokens.length === 0) {
     return (
       <div className="rounded-md bg-surface px-6 py-12 text-center">
@@ -24,7 +66,7 @@ export function WaitingList({ tokens, now, interval, lastServeAt, onMove, onCanc
         <p className="mx-auto mt-1 max-w-sm text-ink-2">
           When someone arrives, add a token. They&rsquo;ll appear here in order, with how long they&rsquo;ve waited.
         </p>
-        <Button variant="secondary" className="mt-5" onClick={onAddFirst}>
+        <Button variant="secondary" className="mt-5" onClick={onAddFirst} data-add-first>
           <IconPlus />
           Add the first token
         </Button>
@@ -44,7 +86,8 @@ export function WaitingList({ tokens, now, interval, lastServeAt, onMove, onCanc
           <li
             key={t.id}
             data-testid="waiting-row"
-            className="grid grid-cols-[24px_auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-3 py-3 sm:grid-cols-[24px_auto_minmax(0,1fr)_150px_88px_auto]"
+            data-token-row={t.id}
+            className="grid grid-cols-[24px_auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-3 py-3 sm:grid-cols-[24px_auto_minmax(0,1fr)_176px_104px_auto]"
           >
             <span className="num text-right text-sm text-ink-3">
               <span className="sr-only">Position </span>
@@ -54,7 +97,7 @@ export function WaitingList({ tokens, now, interval, lastServeAt, onMove, onCanc
               #{t.number}
             </span>
             <div className="min-w-0">
-              <p className="truncate font-medium">{t.label ?? <span className="font-normal text-ink-3">No name</span>}</p>
+              <p className="truncate font-medium">{t.label ?? <NoName />}</p>
               {t.lastMove ? (
                 <p className="flex items-center gap-1 text-xs text-ink-3">
                   {t.lastMove === "up" ? <IconUp className="size-3" /> : <IconDown className="size-3" />}
@@ -74,18 +117,19 @@ export function WaitingList({ tokens, now, interval, lastServeAt, onMove, onCanc
                 </span>
               </p>
               <p className="whitespace-nowrap text-ink-2" title="Estimated time until called, from the recent serving pace">
-                <span className="text-ink-3 sm:sr-only">est. </span>
+                <span className="text-ink-3" aria-hidden>est. </span>
                 <span className="sr-only">Estimated wait </span>
                 <span className="tnum">{formatEstimate(est)}</span>
               </p>
             </div>
 
-            <div className="col-start-4 row-start-1 flex items-center gap-0.5 sm:col-start-6 sm:row-start-1">
+            <div className="col-start-4 row-start-1 flex items-center gap-0.5 sm:col-start-6 sm:row-start-1 pointer-coarse:gap-1">
               <Button
                 variant="ghost"
                 size="sm"
                 disabled={first}
-                onClick={() => onMove(t, "up")}
+                onClick={() => moveTo(t, "up")}
+                data-move="up"
                 aria-label={`Move #${t.number} up`}
                 title={first ? "Already first" : "Move up"}
               >
@@ -95,7 +139,8 @@ export function WaitingList({ tokens, now, interval, lastServeAt, onMove, onCanc
                 variant="ghost"
                 size="sm"
                 disabled={last}
-                onClick={() => onMove(t, "down")}
+                onClick={() => moveTo(t, "down")}
+                data-move="down"
                 aria-label={`Move #${t.number} down`}
                 title={last ? "Already last" : "Move down"}
               >
@@ -104,7 +149,9 @@ export function WaitingList({ tokens, now, interval, lastServeAt, onMove, onCanc
               <Button
                 variant="danger"
                 size="sm"
-                onClick={() => onCancel(t)}
+                className="pointer-coarse:ml-2"
+                onClick={() => cancelAt(t, i)}
+                data-cancel-token
                 aria-label={`Cancel #${t.number}`}
                 title="Cancel token (you can undo)"
               >

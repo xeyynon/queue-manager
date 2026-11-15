@@ -12,7 +12,8 @@ function Svg({ className, title, children }: P & { children: React.ReactNode }) 
       strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={className}
+      // shrink-0: in a tight flex row an icon must never be squeezed to a dot (audit 2026-11-15).
+      className={`shrink-0 ${className ?? ""}`}
       aria-hidden={title ? undefined : true}
       role={title ? "img" : undefined}
     >
