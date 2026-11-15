@@ -1,13 +1,29 @@
 # Queue Manager
 
-A token queue system for walk-in counters (clinic, bank, office). A manager signs in, creates named queues, issues tokens, reorders them, serves the top token with one click, cancels with undo, and reads wait-time analytics.
+A token queue system for walk-in counters such as a clinic, bank or office.
 
-> **Live:** https://queue-manager-bice.vercel.app · Click **"Sign in to the demo account"** on the sign-in page to explore 30 days of **simulated** sample data (labelled on every screen), or create your own empty account.
+A manager can:
+- create named queues and issue tokens
+- reorder tokens and serve the top one with one click
+- cancel a token, with undo
+- read wait-time analytics
+
+## Try it
+**Live app:** https://queue-manager-bice.vercel.app
+
+| Option | How |
+|---|---|
+| Demo account | Click **Sign in to the demo account** on the sign-in page |
+| Your own account | Click **Create account**; it starts empty |
+
+The demo holds 30 days of **simulated** data, and every screen says so.
 
 <img src="docs/screenshots/queue-1280-light.png" alt="Queue screen: add a token, the waiting list with live wait timers and estimates, Now serving and the one-click Serve next button">
 
 ## Screenshots
-All screenshots are of the demo account (simulated data, hence the "Sample data" strip), taken from a production build on 2026-11-15. Light and dark follow the system setting, and can be switched in the menu. Full-page phone shots draw the docked "Serve next" bar mid-page; on a real phone it stays at the bottom of the screen.
+- Taken from the production build on 2026-11-15, signed in as the demo account (hence the "Sample data" strip).
+- Light and dark follow the system setting; switch them in the menu.
+- Phone shots are full-page, so the docked **Serve next** bar appears mid-page. On a real phone it stays at the bottom.
 
 ### Desktop (1280 px)
 | | Light | Dark |
@@ -69,15 +85,32 @@ Retake them all with `npm run build && npx next start`, then `node scripts/scree
 | 8 | Analytics dashboard | `/dashboard` | `analytics-service.ts`, `dashboard/` | R8 |
 
 ## What makes it robust
-- **No double serving.** Every change to a queue runs in one transaction that locks the queue row (`SELECT … FOR UPDATE`). "Serve next" also sends the token the manager saw at the top; if anything changed, nobody is served and the screen refreshes. Tested with 10 simultaneous serve requests.
+- **No double serving.**
+  - Every change to a queue runs in one transaction that locks the queue row (`SELECT … FOR UPDATE`).
+  - "Serve next" sends the token the manager saw at the top. If the queue changed, nobody is served and the screen refreshes.
+  - Tested with 10 simultaneous serve requests.
 - **Ownership on every query.** Another manager's queue looks exactly like a missing one (404).
 - **Honest numbers.** Estimated waits use Little's Law on the recent serving pace and show "—" until there are 3 serves in the last 2 hours; percentiles need 5 served.
 - **Audit trail.** Every add, move, serve, cancel and undo is logged with who and when, and shown on the queue screen.
 - **Feels instant.** Optimistic updates with rollback; requests sent in click order; undo instead of "are you sure?".
-- **Accessible and readable.** Status is never colour alone (clock icon + "long wait" + colour); every colour pair is measured against WCAG in both themes, including the edges of form fields; keyboard focus stays in the list after a move or cancel (E2E-tested); 44 px touch targets on phones; charts have a "Show as table" view.
+- **Accessible and readable.**
+  - Status is never colour alone: a long wait shows a clock icon, the words "long wait" and colour.
+  - Every colour pair is measured against WCAG in both themes, including form-field edges.
+  - Keyboard focus stays in the list after a move or cancel (E2E-tested).
+  - Touch targets are 44 px on phones, and every chart has a "Show as table" view.
 
 ## Stack
-Next.js 16 (App Router, TypeScript) · PostgreSQL (Neon) · Drizzle ORM · Better Auth · Tailwind CSS 4 · Recharts · Zod · Vitest · Playwright · Vercel. Each choice was compared against alternatives before building (for example Drizzle over Prisma for native `SELECT … FOR UPDATE`, and Better Auth over the now-maintenance-mode Auth.js).
+| Layer | Choice |
+|---|---|
+| App | Next.js 16 (App Router, TypeScript), Tailwind CSS 4, Recharts |
+| Data | PostgreSQL on Neon, Drizzle ORM, Zod |
+| Auth | Better Auth (email + password) |
+| Tests | Vitest, Playwright |
+| Hosting | Vercel, deployed from GitHub Actions |
+
+Each choice was compared against alternatives first. Two examples:
+- **Drizzle over Prisma:** Drizzle supports `SELECT … FOR UPDATE` natively.
+- **Better Auth over Auth.js:** Auth.js is now in maintenance mode.
 
 ## Run it locally
 Requires Node 20+ and a Postgres database (a free [Neon](https://neon.com) project works).
